@@ -1,0 +1,39 @@
+{% extends "music/base.html" %}
+{% block title %}Кабінет - MusicHub{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Вітаємо, {{ user.stage_name }}!</h2>
+    <p>Роль: {{ role_display }}</p>
+
+    {% if user.role == 'artist' %}
+        <h3>Ваші альбоми</h3>
+        <ul>
+        {% for album in albums %}
+            <li>{{ album.title }} ({{ album.release_date }})</li>
+        {% empty %}
+            <li>Альбомів ще немає.</li>
+        {% endfor %}
+        </ul>
+    {% elif user.role == 'admin' %}
+        <h3>Адмін-панель</h3>
+        <ul>
+            <li>Користувачів: {{ total_users }}</li>
+            <li>Альбомів: {{ total_albums }}</li>
+            <li>Жанрів: {{ total_genres }}</li>
+        </ul>
+        <h4>Останні користувачі:</h4>
+        <ul>
+            {% for u in recent_users %}
+                <li>{{ u.username }} ({{ u.get_role_display }})</li>
+            {% endfor %}
+        </ul>
+    {% elif user.role == 'producer' %}
+        <h3>Колаборації</h3>
+        <ul>
+            {% for album in collaborations %}
+                <li>{{ album.title }} - {{ album.artist.stage_name }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}

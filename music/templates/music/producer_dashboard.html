@@ -1,0 +1,437 @@
+<!-- templates/music/producer_dashboard.html -->
+{% extends "music/base.html" %}
+{% block title %}Кабінет продюсера - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .welcome-section {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(240, 147, 251, 0.3);
+    }
+
+    .welcome-section h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-section p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid #f093fb;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .actions-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .action-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+
+    .action-card:hover {
+        border-color: #f093fb;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(240, 147, 251, 0.15);
+    }
+
+    .action-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .action-card h3 {
+        color: #f093fb;
+        margin-bottom: 0.8rem;
+        font-size: 1.3rem;
+    }
+
+    .action-card p {
+        color: #666;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .action-btn {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+    }
+
+    .projects-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+
+    .project-item {
+        padding: 1.5rem;
+        border: 2px solid #f0f0f0;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .project-item:hover {
+        border-color: #f093fb;
+        box-shadow: 0 5px 15px rgba(240, 147, 251, 0.1);
+    }
+
+    .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .project-title {
+        font-size: 1.2rem;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .project-status {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .project-details {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .project-details p {
+        margin-bottom: 0.5rem;
+    }
+
+    .beats-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .beats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .beat-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .beat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .beat-cover {
+        height: 150px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+    }
+
+    .beat-info {
+        padding: 1rem;
+    }
+
+    .beat-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.3rem;
+    }
+
+    .beat-stats {
+        color: #999;
+        font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 1rem;
+        }
+
+        .welcome-section h1 {
+            font-size: 2rem;
+        }
+
+        .project-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <h1>🎚️ Вітаємо, {{ user.username }}!</h1>
+        <p>Керуйте своїми бітами та співпрацями</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🎹</div>
+            <div class="stat-label">Бітів створено</div>
+            <div class="stat-value">48</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🤝</div>
+            <div class="stat-label">Активних проєктів</div>
+            <div class="stat-value">7</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">Співпраць з артистами</div>
+            <div class="stat-value">15</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Дохід (цього місяця)</div>
+            <div class="stat-value">$850</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions-section">
+        <h2 class="section-title">Швидкі дії</h2>
+        <div class="actions-grid">
+            <div class="action-card">
+                <div class="action-icon">🎹</div>
+                <h3>Завантажити біт</h3>
+                <p>Додайте новий біт до портфоліо</p>
+                <a href="#" class="action-btn">Завантажити</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">🔍</div>
+                <h3>Знайти артистів</h3>
+                <p>Шукайте талановитих виконавців</p>
+                <a href="#" class="action-btn">Пошук</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">📁</div>
+                <h3>Мої проєкти</h3>
+                <p>Керуйте активними співпрацями</p>
+                <a href="#" class="action-btn">Переглянути</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">📊</div>
+                <h3>Аналітика</h3>
+                <p>Статистика завантажень та продажів</p>
+                <a href="#" class="action-btn">Відкрити</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">💼</div>
+                <h3>Портфоліо</h3>
+                <p>Редагуйте своє портфоліо</p>
+                <a href="#" class="action-btn">Редагувати</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">💸</div>
+                <h3>Продажі</h3>
+                <p>Керуйте продажами бітів</p>
+                <a href="#" class="action-btn">Переглянути</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Projects -->
+    <div class="projects-section">
+        <h2 class="section-title">Активні проєкти</h2>
+        
+        <div class="project-item">
+            <div class="project-header">
+                <div class="project-title">🎵 Trap Beat Collab</div>
+                <span class="project-status status-active">Активний</span>
+            </div>
+            <div class="project-details">
+                <p><strong>Артист:</strong> MC Flow</p>
+                <p><strong>Статус:</strong> Очікується запис вокалу</p>
+                <p><strong>Дедлайн:</strong> 15 листопада 2025</p>
+            </div>
+        </div>
+
+        <div class="project-item">
+            <div class="project-header">
+                <div class="project-title">🎹 Lo-Fi Album Production</div>
+                <span class="project-status status-active">Активний</span>
+            </div>
+            <div class="project-details">
+                <p><strong>Артист:</strong> ChillBeats UA</p>
+                <p><strong>Статус:</strong> Міксування 5-го треку</p>
+                <p><strong>Дедлайн:</strong> 30 листопада 2025</p>
+            </div>
+        </div>
+
+        <div class="project-item">
+            <div class="project-header">
+                <div class="project-title">🎸 Rock Single</div>
+                <span class="project-status status-pending">Очікує</span>
+            </div>
+            <div class="project-details">
+                <p><strong>Артист:</strong> Rebel Sound</p>
+                <p><strong>Статус:</strong> Очікується підтвердження контракту</p>
+                <p><strong>Запропоновано:</strong> 3 дні тому</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Beats -->
+    <div class="beats-section">
+        <h2 class="section-title">Мої біти</h2>
+        <div class="beats-grid">
+            <div class="beat-card">
+                <div class="beat-cover">🎹</div>
+                <div class="beat-info">
+                    <div class="beat-name">Dark Trap Beat</div>
+                    <div class="beat-stats">120 BPM • 340 прослуховувань</div>
+                </div>
+            </div>
+
+            <div class="beat-card">
+                <div class="beat-cover" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">🎵</div>
+                <div class="beat-info">
+                    <div class="beat-name">Chill Lo-Fi</div>
+                    <div class="beat-stats">85 BPM • 520 прослуховувань</div>
+                </div>
+            </div>
+
+            <div class="beat-card">
+                <div class="beat-cover" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">🎸</div>
+                <div class="beat-info">
+                    <div class="beat-name">Rock Energy</div>
+                    <div class="beat-stats">140 BPM • 280 прослуховувань</div>
+                </div>
+            </div>
+
+            <div class="beat-card">
+                <div class="beat-cover" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🎺</div>
+                <div class="beat-info">
+                    <div class="beat-name">Jazz Vibes</div>
+                    <div class="beat-stats">95 BPM • 450 прослуховувань</div>
+                </div>
+            </div>
+
+            <div class="beat-card">
+                <div class="beat-cover" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">🎼</div>
+                <div class="beat-info">
+                    <div class="beat-name">Electronic Wave</div>
+                    <div class="beat-stats">128 BPM • 610 прослуховувань</div>
+                </div>
+            </div>
+
+            <div class="beat-card">
+                <div class="beat-cover" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">🥁</div>
+                <div class="beat-info">
+                    <div class="beat-name">Hip-Hop Classic</div>
+                    <div class="beat-stats">90 BPM • 720 прослуховувань</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

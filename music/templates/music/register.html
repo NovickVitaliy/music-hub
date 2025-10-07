@@ -1,0 +1,476 @@
+<!-- templates/music/register.html -->
+{% extends "music/base.html" %}
+{% block title %}Реєстрація - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    main {
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 120px);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 2rem 0 !important;
+    }
+
+    main::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600') center/cover;
+        opacity: 0.1;
+    }
+
+    .register-container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 550px;
+        padding: 2rem;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .register-card {
+        background: white;
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .register-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .register-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .register-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    .register-header h2 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .register-header p {
+        color: #666;
+        font-size: 1rem;
+    }
+
+    /* Django form styling */
+    form p {
+        margin-bottom: 1.5rem;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .helptext {
+        display: block;
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.3rem;
+        line-height: 1.4;
+    }
+
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="password"],
+    form select {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        font-family: inherit;
+    }
+
+    form input:focus,
+    form select:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Error styling */
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0 0 0;
+    }
+
+    .errorlist li {
+        background: #fee;
+        color: #c33;
+        padding: 0.6rem;
+        border-radius: 8px;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        border-left: 3px solid #c33;
+    }
+
+    .btn-register {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        margin-top: 1rem;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-register:active {
+        transform: translateY(0);
+    }
+
+    .form-footer {
+        margin-top: 2rem;
+        text-align: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .form-footer p {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-footer a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .form-footer a:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+    .login-link {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+    }
+
+    .login-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+    }
+
+    .password-requirements {
+        background: #f0f7ff;
+        border: 1px solid #d0e7ff;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .password-requirements h4 {
+        color: #667eea;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .password-requirements ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        line-height: 1.8;
+    }
+
+    .password-requirements li {
+        color: #666;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes floating {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .register-container {
+            padding: 1rem;
+        }
+
+        .register-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .register-header h2 {
+            font-size: 1.8rem;
+        }
+
+        .register-icon {
+            font-size: 3rem;
+        }
+    }
+
+    /* Decorative elements */
+    .floating-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .shape {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .shape1 {
+        width: 300px;
+        height: 300px;
+        top: -150px;
+        right: -100px;
+        animation: float1 20s infinite ease-in-out;
+    }
+
+    .shape2 {
+        width: 200px;
+        height: 200px;
+        bottom: -100px;
+        left: -50px;
+        animation: float2 15s infinite ease-in-out;
+    }
+
+    .shape3 {
+        width: 150px;
+        height: 150px;
+        top: 50%;
+        right: 10%;
+        animation: float1 25s infinite ease-in-out;
+    }
+
+    @keyframes float1 {
+        0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+        }
+        50% {
+            transform: translate(50px, 50px) rotate(180deg);
+        }
+    }
+
+    @keyframes float2 {
+        0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+        }
+        50% {
+            transform: translate(-30px, -30px) rotate(-180deg);
+        }
+    }
+
+    /* Custom checkbox/radio styling */
+    input[type="checkbox"],
+    input[type="radio"] {
+        width: auto !important;
+        margin-right: 0.5rem;
+        cursor: pointer;
+    }
+
+    /* Success message */
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #28a745;
+        font-size: 0.95rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="floating-shapes">
+    <div class="shape shape1"></div>
+    <div class="shape shape2"></div>
+    <div class="shape shape3"></div>
+</div>
+
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <span class="register-icon">🎵</span>
+            <h2>Приєднуйтесь до MusicHub</h2>
+            <p>Створіть акаунт та станьте частиною музичної спільноти</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="success-message">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div class="errorlist">
+                        <li>{{ message }}</li>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <p>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    
+                    {% if field.help_text %}
+                        <span class="helptext">{{ field.help_text|safe }}</span>
+                    {% endif %}
+                    
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </p>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <div class="password-requirements">
+                <h4>📋 Вимоги до пароля:</h4>
+                <ul>
+                    <li>Мінімум 8 символів</li>
+                    <li>Не може бути занадто схожим на інші ваші дані</li>
+                    <li>Не може складатися лише з цифр</li>
+                    <li>Не може бути занадто простим</li>
+                </ul>
+            </div>
+
+            <button type="submit" class="btn-register">Зареєструватися</button>
+        </form>
+
+        <div class="form-footer">
+            <p>Вже маєте акаунт?</p>
+            <a href="{% url 'music:login' %}" class="login-link">Увійти</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-hide success messages after 5 seconds
+    setTimeout(function() {
+        const successMessages = document.querySelectorAll('.success-message');
+        successMessages.forEach(function(msg) {
+            msg.style.transition = 'opacity 0.5s ease';
+            msg.style.opacity = '0';
+            setTimeout(function() {
+                msg.remove();
+            }, 500);
+        });
+    }, 5000);
+
+    // Add visual feedback for form validation
+    document.querySelectorAll('input, select').forEach(function(input) {
+        input.addEventListener('blur', function() {
+            if (this.value.trim() !== '') {
+                this.style.borderColor = '#28a745';
+            }
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.style.borderColor === 'rgb(40, 167, 69)') {
+                this.style.borderColor = '#e0e0e0';
+            }
+        });
+    });
+
+    // Password strength indicator (optional)
+    const passwordFields = document.querySelectorAll('input[type="password"]');
+    if (passwordFields.length > 0) {
+        passwordFields[0].addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+            
+            // You can add a visual strength indicator here if needed
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "music/base.html" %}
+{% block title %}Профіль - MusicHub{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Профіль користувача</h2>
+    <p>Ім'я користувача: {{ user.username }}</p>
+    <p>Електронна пошта: {{ user.email }}</p>
+    <p>Роль: {{ user.get_role_display }}</p>
+    <p>Сценічне ім'я: {{ user.stage_name }}</p>
+    <p>Біографія: {{ user.bio }}</p>
+</div>
+{% endblock %}

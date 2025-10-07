@@ -1,0 +1,515 @@
+<!-- templates/music/manager_dashboard.html -->
+{% extends "music/base.html" %}
+{% block title %}Кабінет менеджера - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .welcome-section {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(250, 112, 154, 0.3);
+    }
+
+    .welcome-section h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .welcome-section p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid #fa709a;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .stat-trend {
+        font-size: 0.85rem;
+        color: #28a745;
+        margin-top: 0.5rem;
+    }
+
+    .stat-trend.down {
+        color: #dc3545;
+    }
+
+    .actions-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .action-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+
+    .action-card:hover {
+        border-color: #fa709a;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(250, 112, 154, 0.15);
+    }
+
+    .action-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .action-card h3 {
+        color: #fa709a;
+        margin-bottom: 0.8rem;
+        font-size: 1.3rem;
+    }
+
+    .action-card p {
+        color: #666;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .action-btn {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(250, 112, 154, 0.4);
+    }
+
+    .artists-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+
+    .artist-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .artist-table thead {
+        background: #f8f9fa;
+    }
+
+    .artist-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .artist-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .artist-table tr:hover {
+        background: #f8f9fa;
+    }
+
+    .artist-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .artist-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .artist-details h4 {
+        color: #333;
+        margin-bottom: 0.3rem;
+        font-weight: 600;
+    }
+
+    .artist-details p {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .contract-status {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-expiring {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-pending {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .btn-manage {
+        padding: 0.5rem 1.5rem;
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-manage:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(250, 112, 154, 0.3);
+    }
+
+    .contracts-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .contract-item {
+        padding: 1.5rem;
+        border: 2px solid #f0f0f0;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .contract-item:hover {
+        border-color: #fa709a;
+        box-shadow: 0 5px 15px rgba(250, 112, 154, 0.1);
+    }
+
+    .contract-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .contract-title {
+        font-size: 1.2rem;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .contract-details {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .contract-details strong {
+        color: #333;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 1rem;
+        }
+
+        .welcome-section h1 {
+            font-size: 2rem;
+        }
+
+        .artist-table {
+            font-size: 0.9rem;
+        }
+
+        .artist-table th,
+        .artist-table td {
+            padding: 0.8rem 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <h1>🏢 Вітаємо, {{ user.username }}!</h1>
+        <p>Керуйте своїм лейблом та артистами</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">Артистів під контрактом</div>
+            <div class="stat-value">12</div>
+            <div class="stat-trend">↑ +2 цього місяця</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💿</div>
+            <div class="stat-label">Активних релізів</div>
+            <div class="stat-value">28</div>
+            <div class="stat-trend">↑ +5 цього тижня</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Дохід (цього місяця)</div>
+            <div class="stat-value">$15.2K</div>
+            <div class="stat-trend">↑ +18% від минулого</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-label">Загальні прослуховування</div>
+            <div class="stat-value">2.4M</div>
+            <div class="stat-trend">↑ +12% цього місяця</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions-section">
+        <h2 class="section-title">Швидкі дії</h2>
+        <div class="actions-grid">
+            <div class="action-card">
+                <div class="action-icon">✍️</div>
+                <h3>Новий контракт</h3>
+                <p>Укласти контракт з артистом</p>
+                <a href="#" class="action-btn">Створити</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">🔍</div>
+                <h3>Пошук талантів</h3>
+                <p>Знайдіть нових перспективних артистів</p>
+                <a href="#" class="action-btn">Шукати</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">📈</div>
+                <h3>Аналітика</h3>
+                <p>Детальна статистика лейблу</p>
+                <a href="#" class="action-btn">Переглянути</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">🎵</div>
+                <h3>Реліз треку</h3>
+                <p>Опублікувати новий реліз</p>
+                <a href="#" class="action-btn">Опублікувати</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">💼</div>
+                <h3>Портфоліо лейблу</h3>
+                <p>Редагуйте інформацію про лейбл</p>
+                <a href="#" class="action-btn">Редагувати</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">💸</div>
+                <h3>Фінанси</h3>
+                <p>Керування платежами та роялті</p>
+                <a href="#" class="action-btn">Відкрити</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Artists Under Contract -->
+    <div class="artists-section">
+        <h2 class="section-title">Артисти лейблу</h2>
+        <table class="artist-table">
+            <thead>
+                <tr>
+                    <th>Артист</th>
+                    <th>Жанр</th>
+                    <th>Контракт</th>
+                    <th>Треків</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="artist-info">
+                            <div class="artist-avatar">🎤</div>
+                            <div class="artist-details">
+                                <h4>MC Flow</h4>
+                                <p>Ukrainian Hip-Hop</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Hip-Hop</td>
+                    <td><span class="contract-status status-active">Активний</span></td>
+                    <td>15</td>
+                    <td><button class="btn-manage">Керувати</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="artist-info">
+                            <div class="artist-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🎸</div>
+                            <div class="artist-details">
+                                <h4>Rock Rebels</h4>
+                                <p>Alternative Rock</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Rock</td>
+                    <td><span class="contract-status status-active">Активний</span></td>
+                    <td>22</td>
+                    <td><button class="btn-manage">Керувати</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="artist-info">
+                            <div class="artist-avatar" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">🎹</div>
+                            <div class="artist-details">
+                                <h4>ChillBeats UA</h4>
+                                <p>Lo-Fi / Electronic</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Electronic</td>
+                    <td><span class="contract-status status-expiring">Закінчується</span></td>
+                    <td>18</td>
+                    <td><button class="btn-manage">Керувати</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="artist-info">
+                            <div class="artist-avatar" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🎺</div>
+                            <div class="artist-details">
+                                <h4>Jazz Collective</h4>
+                                <p>Contemporary Jazz</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Jazz</td>
+                    <td><span class="contract-status status-pending">На розгляді</span></td>
+                    <td>8</td>
+                    <td><button class="btn-manage">Керувати</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Recent Contracts -->
+    <div class="contracts-section">
+        <h2 class="section-title">Останні контракти</h2>
+        
+        <div class="contract-item">
+            <div class="contract-header">
+                <div class="contract-title">📄 Контракт з MC Flow</div>
+                <span class="contract-status status-active">Активний</span>
+            </div>
+            <div class="contract-details">
+                <p><strong>Тип:</strong> Ексклюзивний реліз</p>
+                <p><strong>Термін:</strong> 24 місяці (залишилось 18 міс.)</p>
+                <p><strong>Роялті:</strong> 70% артисту / 30% лейблу</p>
+                <p><strong>Дата підписання:</strong> 15 січня 2024</p>
+            </div>
+        </div>
+
+        <div class="contract-item">
+            <div class="contract-header">
+                <div class="contract-title">📄 Контракт з ChillBeats UA</div>
+                <span class="contract-status status-expiring">Закінчується</span>
+            </div>
+            <div class="contract-details">
+                <p><strong>Тип:</strong> Дистрибуція альбому</p>
+                <p><strong>Термін:</strong> 12 місяців (залишилось 2 міс.)</p>
+                <p><strong>Роялті:</strong> 60% артисту / 40% лейблу</p>
+                <p><strong>Дата підписання:</strong> 10 жовтня 2024</p>
+            </div>
+        </div>
+
+        <div class="contract-item">
+            <div class="contract-header">
+                <div class="contract-title">📄 Пропозиція для Jazz Collective</div>
+                <span class="contract-status status-pending">На розгляді</span>
+            </div>
+            <div class="contract-details">
+                <p><strong>Тип:</strong> Довгострокова співпраця</p>
+                <p><strong>Запропонований термін:</strong> 36 місяців</p>
+                <p><strong>Роялті:</strong> 65% артисту / 35% лейблу</p>
+                <p><strong>Статус:</strong> Очікується відповідь артиста</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,296 @@
+<!-- templates/music/artist_dashboard.html -->
+{% extends "music/base.html" %}
+{% block title %}Кабінет артиста - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .welcome-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .welcome-section h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-section p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid #667eea;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .actions-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .action-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+
+    .action-card:hover {
+        border-color: #667eea;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+    }
+
+    .action-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .action-card h3 {
+        color: #667eea;
+        margin-bottom: 0.8rem;
+        font-size: 1.3rem;
+    }
+
+    .action-card p {
+        color: #666;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .action-btn {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .recent-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .recent-item {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .recent-item:last-child {
+        border-bottom: none;
+    }
+
+    .recent-item-info h4 {
+        color: #333;
+        margin-bottom: 0.3rem;
+    }
+
+    .recent-item-info p {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .recent-item-status {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-published {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-draft {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 1rem;
+        }
+
+        .welcome-section h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <h1>🎤 Вітаємо, {{ user.username }}!</h1>
+        <p>Керуйте своєю музичною кар'єрою з панелі артиста</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🎵</div>
+            <div class="stat-label">Загальна кількість треків</div>
+            <div class="stat-value">24</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💿</div>
+            <div class="stat-label">Альбомів</div>
+            <div class="stat-value">3</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">Підписників</div>
+            <div class="stat-value">1,234</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">▶️</div>
+            <div class="stat-label">Прослуховувань</div>
+            <div class="stat-value">45.6K</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions-section">
+        <h2 class="section-title">Швидкі дії</h2>
+        <div class="actions-grid">
+            <div class="action-card">
+                <div class="action-icon">🎵</div>
+                <h3>Завантажити трек</h3>
+                <p>Додайте новий трек до своєї колекції</p>
+                <a href="#" class="action-btn">Завантажити</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">💿</div>
+                <h3>Створити альбом</h3>
+                <p>Об'єднайте треки в альбом</p>
+                <a href="#" class="action-btn">Створити</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">📊</div>
+                <h3>Статистика</h3>
+                <p>Переглядайте аналітику прослуховувань</p>
+                <a href="#" class="action-btn">Переглянути</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">🤝</div>
+                <h3>Співпраця</h3>
+                <p>Знайдіть продюсерів для спільної роботи</p>
+                <a href="#" class="action-btn">Знайти</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">👤</div>
+                <h3>Профіль</h3>
+                <p>Редагуйте свій профіль артиста</p>
+                <a href="#" class="action-btn">Редагувати</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">💰</div>
+                <h3>Доходи</h3>
+                <p>Переглядайте свої заробітки</p>
+                <a href="#" class="action-btn">Переглянути</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Tracks -->
+    <div class="recent-section">
+        <h2 class="section-title">Останні треки</h2>
+        <div class="recent-item">
+            <div class="recent-item-info">
+                <h4>Summer Vibes</h4>
+                <p>Завантажено 2 дні тому</p>
+            </div>
+            <span class="recent-item-status status-published">Опубліковано</span>
+        </div>
+        <div class="recent-item">
+            <div class="recent-item-info">
+                <h4>Midnight Dreams</h4>
+                <p>Завантажено 5 днів тому</p>
+            </div>
+            <span class="recent-item-status status-published">Опубліковано</span>
+        </div>
+        <div class="recent-item">
+            <div class="recent-item-info">
+                <h4>Urban Beat (Demo)</h4>
+                <p>Завантажено тиждень тому</p>
+            </div>
+            <span class="recent-item-status status-draft">Чернетка</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

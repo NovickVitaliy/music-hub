@@ -1,0 +1,475 @@
+<!-- templates/music/listener_home.html -->
+{% extends "music/base.html" %}
+{% block title %}Моя музика - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .listener-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .welcome-section {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(67, 233, 123, 0.3);
+    }
+
+    .welcome-section h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-section p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+    }
+
+    .tabs-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        padding: 0.8rem 2rem;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        color: #666;
+    }
+
+    .tab-btn:hover {
+        border-color: #43e97b;
+        color: #43e97b;
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+        border-color: transparent;
+    }
+
+    .music-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .music-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .music-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+
+    .music-cover {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        position: relative;
+    }
+
+    .play-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .music-card:hover .play-overlay {
+        opacity: 1;
+    }
+
+    .play-btn {
+        font-size: 3rem;
+        color: white;
+    }
+
+    .music-info {
+        padding: 1rem;
+    }
+
+    .music-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.3rem;
+        font-size: 1rem;
+    }
+
+    .music-artist {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .playlists-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        color: #333;
+        font-weight: 700;
+    }
+
+    .create-btn {
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .create-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(67, 233, 123, 0.4);
+    }
+
+    .playlist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .playlist-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .playlist-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .playlist-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .playlist-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .playlist-info {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .favorites-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .favorite-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+    .favorite-item:hover {
+        background: #f8f9fa;
+    }
+
+    .favorite-item:last-child {
+        border-bottom: none;
+    }
+
+    .favorite-cover {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+
+    .favorite-details {
+        flex: 1;
+    }
+
+    .favorite-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.3rem;
+    }
+
+    .favorite-artist {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .favorite-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .action-icon {
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .action-icon:hover {
+        transform: scale(1.2);
+    }
+
+    @media (max-width: 768px) {
+        .listener-container {
+            padding: 1rem;
+        }
+
+        .welcome-section h1 {
+            font-size: 2rem;
+        }
+
+        .music-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="listener-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <h1>🎧 Привіт, {{ user.username }}!</h1>
+        <p>Відкривайте нову музику та насолоджуйтесь улюбленими треками</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+        <button class="tab-btn active">Рекомендації</button>
+        <button class="tab-btn">Нові релізи</button>
+        <button class="tab-btn">Популярне</button>
+        <button class="tab-btn">Жанри</button>
+        <button class="tab-btn">Артисти</button>
+    </div>
+
+    <!-- Music Grid -->
+    <div class="section-header">
+        <h2 class="section-title">Рекомендовано для вас</h2>
+    </div>
+    <div class="music-grid">
+        <div class="music-card">
+            <div class="music-cover">
+                🎵
+                <div class="play-overlay">
+                    <div class="play-btn">▶️</div>
+                </div>
+            </div>
+            <div class="music-info">
+                <div class="music-title">Summer Nights</div>
+                <div class="music-artist">DJ Sunshine</div>
+            </div>
+        </div>
+
+        <div class="music-card">
+            <div class="music-cover" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                🎸
+                <div class="play-overlay">
+                    <div class="play-btn">▶️</div>
+                </div>
+            </div>
+            <div class="music-info">
+                <div class="music-title">Rock Anthem</div>
+                <div class="music-artist">Thunder Band</div>
+            </div>
+        </div>
+
+        <div class="music-card">
+            <div class="music-cover" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                🎹
+                <div class="play-overlay">
+                    <div class="play-btn">▶️</div>
+                </div>
+            </div>
+            <div class="music-info">
+                <div class="music-title">Piano Dreams</div>
+                <div class="music-artist">Classical Joe</div>
+            </div>
+        </div>
+
+        <div class="music-card">
+            <div class="music-cover" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                🎤
+                <div class="play-overlay">
+                    <div class="play-btn">▶️</div>
+                </div>
+            </div>
+            <div class="music-info">
+                <div class="music-title">Hip Hop Flow</div>
+                <div class="music-artist">MC Rhythm</div>
+            </div>
+        </div>
+
+        <div class="music-card">
+            <div class="music-cover" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                🎺
+                <div class="play-overlay">
+                    <div class="play-btn">▶️</div>
+                </div>
+            </div>
+            <div class="music-info">
+                <div class="music-title">Jazz Vibes</div>
+                <div class="music-artist">Smooth Jazz Trio</div>
+            </div>
+        </div>
+
+        <div class="music-card">
+            <div class="music-cover" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                🎼
+                <div class="play-overlay">
+                    <div class="play-btn">▶️</div>
+                </div>
+            </div>
+            <div class="music-info">
+                <div class="music-title">Electronic Pulse</div>
+                <div class="music-artist">Synth Master</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Playlists Section -->
+    <div class="playlists-section">
+        <div class="section-header">
+            <h2 class="section-title">Мої плейлисти</h2>
+            <button class="create-btn">+ Створити плейлист</button>
+        </div>
+        <div class="playlist-grid">
+            <div class="playlist-card">
+                <div class="playlist-icon">❤️</div>
+                <div class="playlist-name">Улюблені</div>
+                <div class="playlist-info">42 треки • 2 год 35 хв</div>
+            </div>
+
+            <div class="playlist-card">
+                <div class="playlist-icon">🏃</div>
+                <div class="playlist-name">Для тренувань</div>
+                <div class="playlist-info">28 треків • 1 год 45 хв</div>
+            </div>
+
+            <div class="playlist-card">
+                <div class="playlist-icon">😌</div>
+                <div class="playlist-name">Релакс</div>
+                <div class="playlist-info">35 треків • 2 год 10 хв</div>
+            </div>
+
+            <div class="playlist-card">
+                <div class="playlist-icon">🎉</div>
+                <div class="playlist-name">Вечірка</div>
+                <div class="playlist-info">50 треків • 3 год 20 хв</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Favorites Section -->
+    <div class="favorites-section">
+        <h2 class="section-title">Нещодавно прослухане</h2>
+        
+        <div class="favorite-item">
+            <div class="favorite-cover">🎵</div>
+            <div class="favorite-details">
+                <div class="favorite-title">Midnight Jazz</div>
+                <div class="favorite-artist">Cool Cats Ensemble</div>
+            </div>
+            <div class="favorite-actions">
+                <span class="action-icon">❤️</span>
+                <span class="action-icon">➕</span>
+                <span class="action-icon">▶️</span>
+            </div>
+        </div>
+
+        <div class="favorite-item">
+            <div class="favorite-cover" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🎸</div>
+            <div class="favorite-details">
+                <div class="favorite-title">Electric Storm</div>
+                <div class="favorite-artist">Rock Legends</div>
+            </div>
+            <div class="favorite-actions">
+                <span class="action-icon">❤️</span>
+                <span class="action-icon">➕</span>
+                <span class="action-icon">▶️</span>
+            </div>
+        </div>
+
+        <div class="favorite-item">
+            <div class="favorite-cover" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">🎹</div>
+            <div class="favorite-details">
+                <div class="favorite-title">Ocean Waves</div>
+                <div class="favorite-artist">Nature Sounds</div>
+            </div>
+            <div class="favorite-actions">
+                <span class="action-icon">❤️</span>
+                <span class="action-icon">➕</span>
+                <span class="action-icon">▶️</span>
+            </div>
+        </div>
+
+        <div class="favorite-item">
+            <div class="favorite-cover" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🎤</div>
+            <div class="favorite-details">
+                <div class="favorite-title">Urban Beats</div>
+                <div class="favorite-artist">City Rappers</div>
+            </div>
+            <div class="favorite-actions">
+                <span class="action-icon">❤️</span>
+                <span class="action-icon">➕</span>
+                <span class="action-icon">▶️</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
