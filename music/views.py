@@ -1,5 +1,6 @@
 # music/views.py
 
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -9,6 +10,11 @@ from .forms import CustomUserCreationForm, AlbumForm, TrackForm
 from .models import User, Album, Genre, Track
 from .models import User, Album, Genre, Track, Playlist, Favorite
 from .forms import CustomUserCreationForm, AlbumForm, TrackForm, PlaylistForm
+from django.db import models
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+
 
 def landing_page(request):
     """Landing page - головна сторінка"""
@@ -434,3 +440,84 @@ def favorites_list(request):
 @login_required
 def manager_dashboard(request):
     return render(request, 'music/manager_dashboard.html')
+
+# ==================== MUSIC SEARCH ====================
+@login_required
+def music_search(request):
+    """Пошук музики"""
+    query = request.GET.get('q', '')
+    
+    # Отримуємо плейлисти користувача для швидкого додавання
+    user_playlists = Playlist.objects.filter(user=request.user) if request.user.role == 'listener' else []
+    
+    # Отримуємо ID улюблених треків користувача
+    favorite_track_ids = Favorite.objects.filter(user=request.user).values_list('track_id', flat=True)
+    
+    results = {
+        'albums': [],
+        'tracks': [],
+        'artists': [],
+    }
+    
+    if query:
+        # Пошук альбомів
+        results['albums'] = Album.objects.filter(
+            models.Q(title__icontains=query) | 
+            models.Q(description__icontains=query) |
+            models.Q(genre__name__icontains=query)
+        ).select_related('artist', 'genre')[:10]
+        
+        # Пошук треків
+        results['tracks'] = Track.objects.filter(
+            models.Q(title__icontains=query) |
+            models.Q(album__title__icontains=query) |
+            models.Q(album__artist__username__icontains=query) |
+            models.Q(album__artist__stage_name__icontains=query)
+        ).select_related('album__artist').prefetch_related('playlists')[:20]
+        
+        # Пошук артистів
+        results['artists'] = User.objects.filter(
+            role='artist'
+        ).filter(
+            models.Q(username__icontains=query) |
+            models.Q(stage_name__icontains=query) |
+            models.Q(bio__icontains=query)
+        )[:10]
+    
+    context = {
+        'query': query,
+        'results': results,
+        'user_playlists': user_playlists,
+        'favorite_track_ids': favorite_track_ids,
+    }
+    return render(request, 'music/music_search.html', context)
+
+
+@login_required
+def quick_add_to_playlist(request, track_pk):
+    """Швидке додавання треку до плейлиста через AJAX або звичайний POST"""
+    if request.method == 'POST':
+        playlist_id = request.POST.get('playlist_id')
+        track = get_object_or_404(Track, pk=track_pk)
+        
+        if playlist_id:
+            playlist = get_object_or_404(Playlist, pk=playlist_id, user=request.user)
+            
+            # Перевіряємо чи трек вже є в плейлисті
+            if track in playlist.tracks.all():
+                messages.info(request, f'Трек "{track.title}" вже є в плейлисті "{playlist.name}"')
+            else:
+                playlist.tracks.add(track)
+                messages.success(request, f'Трек "{track.title}" додано до плейлиста "{playlist.name}"!')
+        
+        # Якщо це AJAX запит, повертаємо JSON
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        
+        return redirect(request.META.get('HTTP_REFERER', 'music:music_search'))
+    
+    return redirect('music:music_search')
+
+def logout_view(request):
+    logout(request)
+    return redirect('music:landing')

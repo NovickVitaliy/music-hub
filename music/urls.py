@@ -14,7 +14,7 @@ urlpatterns = [
     # Автентифікація
     path('register/', views.register_view, name='register'),
     path('login/', views.login_view, name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', views.logout_view, name='logout'),
     
     # Дашборди
     path('dashboard/', views.dashboard_view, name='dashboard'),
@@ -46,8 +46,12 @@ urlpatterns = [
     path('playlists/<int:pk>/delete/', views.playlist_delete, name='playlist_delete'),
     path('playlists/<int:playlist_pk>/add/<int:track_pk>/', views.playlist_add_track, name='playlist_add_track'),
     path('playlists/<int:playlist_pk>/remove/<int:track_pk>/', views.playlist_remove_track, name='playlist_remove_track'),
-    
+
     # Favorites
     path('favorites/', views.favorites_list, name='favorites_list'),
     path('tracks/<int:track_pk>/favorite/', views.toggle_favorite, name='toggle_favorite'),
+
+    # Music Search
+    path('search/', views.music_search, name='music_search'),
+    path('tracks/<int:track_pk>/quick-add/', views.quick_add_to_playlist, name='quick_add_to_playlist'),
 ]

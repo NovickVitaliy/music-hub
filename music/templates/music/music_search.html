@@ -1,0 +1,567 @@
+<!-- templates/music/music_search.html -->
+{% extends "music/base.html" %}
+{% block title %}Пошук музики - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .search-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .search-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .search-form {
+        max-width: 600px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1.2rem 3.5rem 1.2rem 1.5rem;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+
+    .search-input:focus {
+        outline: none;
+        box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+    }
+
+    .search-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-50%) scale(1.05);
+    }
+
+    .results-section {
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .result-count {
+        font-size: 1rem;
+        color: #999;
+        font-weight: normal;
+    }
+
+    /* Tracks Results */
+    .tracks-list {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .track-item {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+    .track-item:hover {
+        background: #f8f9fa;
+    }
+
+    .track-item:last-child {
+        border-bottom: none;
+    }
+
+    .track-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .track-info {
+        flex: 1;
+    }
+
+    .track-title {
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .track-album {
+        color: #667eea;
+        font-size: 0.9rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .track-artist {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .track-duration {
+        color: #999;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .track-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+
+    .action-btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: 20px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .btn-favorite {
+        background: #ffe5e5;
+        color: #f5576c;
+    }
+
+    .btn-favorite:hover {
+        background: #f5576c;
+        color: white;
+    }
+
+    .btn-favorite.active {
+        background: #f5576c;
+        color: white;
+    }
+
+    .btn-add {
+        background: #e3f2fd;
+        color: #667eea;
+        position: relative;
+    }
+
+    .btn-add:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    /* Dropdown для плейлистів */
+    .playlist-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background: white;
+        min-width: 200px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        border-radius: 10px;
+        z-index: 1;
+        margin-top: 0.5rem;
+    }
+
+    .dropdown-content.show {
+        display: block;
+    }
+
+    .playlist-option {
+        padding: 0.8rem 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .playlist-option:last-child {
+        border-bottom: none;
+    }
+
+    .playlist-option:hover {
+        background: #f8f9fa;
+    }
+
+    .playlist-option form {
+        margin: 0;
+    }
+
+    .playlist-option button {
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        color: #333;
+        font-weight: 600;
+        padding: 0;
+    }
+
+    /* Albums Grid */
+    .albums-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .album-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+
+    .album-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .album-cover {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+    }
+
+    .album-info {
+        padding: 1rem;
+    }
+
+    .album-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.3rem;
+    }
+
+    .album-artist {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    /* Artists Grid */
+    .artists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .artist-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .artist-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .artist-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 1rem;
+    }
+
+    .artist-name {
+        font-weight: 700;
+        color: #333;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .artist-bio {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .empty-results {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-results h3 {
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-results p {
+        color: #999;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .search-container {
+            padding: 1rem;
+        }
+
+        .search-header h1 {
+            font-size: 2rem;
+        }
+
+        .track-item {
+            flex-wrap: wrap;
+        }
+
+        .track-actions {
+            margin-top: 1rem;
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <a href="{% url 'music:listener_home' %}" class="back-link">← Назад</a>
+
+    <div class="search-header">
+        <h1>🔍 Пошук музики</h1>
+        <form method="get" class="search-form">
+            <input 
+                type="text" 
+                name="q" 
+                class="search-input" 
+                placeholder="Шукайте треки, альбоми, артистів..." 
+                value="{{ query }}"
+                autofocus
+            >
+            <button type="submit" class="search-btn">Знайти</button>
+        </form>
+    </div>
+
+    {% if query %}
+        <!-- Треки -->
+        {% if results.tracks %}
+        <div class="results-section">
+            <h2 class="section-title">
+                🎵 Треки 
+                <span class="result-count">({{ results.tracks|length }})</span>
+            </h2>
+            <div class="tracks-list">
+                {% for track in results.tracks %}
+                <div class="track-item">
+                    <div class="track-icon" style="background: linear-gradient(135deg, 
+                        {% cycle '#667eea 0%, #764ba2 100%' '#f093fb 0%, #f5576c 100%' '#43e97b 0%, #38f9d7 100%' %});">
+                        🎵
+                    </div>
+                    <div class="track-info">
+                        <div class="track-title">{{ track.title }}</div>
+                        <div class="track-album">💿 {{ track.album.title }}</div>
+                        <div class="track-artist">
+                            {{ track.album.artist.stage_name|default:track.album.artist.username }}
+                        </div>
+                    </div>
+                    {% if track.duration %}
+                    <div class="track-duration">
+                        ⏱️ {{ track.get_duration_display }}
+                    </div>
+                    {% endif %}
+                    <div class="track-actions">
+                        <!-- Кнопка улюблених -->
+                        <a href="{% url 'music:toggle_favorite' track.pk %}" 
+                           class="action-btn btn-favorite {% if track.id in favorite_track_ids %}active{% endif %}">
+                            ❤️
+                        </a>
+                        
+                        <!-- Dropdown для додавання в плейлист -->
+                        {% if user_playlists %}
+                        <div class="playlist-dropdown">
+                            <button class="action-btn btn-add" onclick="toggleDropdown({{ track.id }})">
+                                ➕ Додати
+                            </button>
+                            <div class="dropdown-content" id="dropdown-{{ track.id }}">
+                                {% for playlist in user_playlists %}
+                                <div class="playlist-option">
+                                    <form method="post" action="{% url 'music:quick_add_to_playlist' track.pk %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="playlist_id" value="{{ playlist.id }}">
+                                        <button type="submit">{{ playlist.name }}</button>
+                                    </form>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Альбоми -->
+        {% if results.albums %}
+        <div class="results-section">
+            <h2 class="section-title">
+                💿 Альбоми 
+                <span class="result-count">({{ results.albums|length }})</span>
+            </h2>
+            <div class="albums-grid">
+                {% for album in results.albums %}
+                <div class="album-card">
+                    <div class="album-cover" style="background: linear-gradient(135deg, 
+                        {% cycle '#667eea 0%, #764ba2 100%' '#f093fb 0%, #f5576c 100%' '#43e97b 0%, #38f9d7 100%' '#fa709a 0%, #fee140 100%' %});">
+                        💿
+                    </div>
+                    <div class="album-info">
+                        <div class="album-title">{{ album.title }}</div>
+                        <div class="album-artist">
+                            {{ album.artist.stage_name|default:album.artist.username }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Артисти -->
+        {% if results.artists %}
+        <div class="results-section">
+            <h2 class="section-title">
+                🎤 Артисти 
+                <span class="result-count">({{ results.artists|length }})</span>
+            </h2>
+            <div class="artists-grid">
+                {% for artist in results.artists %}
+                <div class="artist-card">
+                    <div class="artist-avatar">🎤</div>
+                    <div class="artist-name">
+                        {{ artist.stage_name|default:artist.username }}
+                    </div>
+                    <div class="artist-bio">
+                        {{ artist.bio|truncatewords:15|default:"Артист" }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Порожні результати -->
+        {% if not results.tracks and not results.albums and not results.artists %}
+        <div class="empty-results">
+            <div class="empty-icon">🔍</div>
+            <h3>Нічого не знайдено</h3>
+            <p>Спробуйте інший запит</p>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <!-- Початковий стан -->
+        <div class="empty-results">
+            <div class="empty-icon">🎵</div>
+            <h3>Почніть пошук музики</h3>
+            <p>Введіть назву треку, альбому або артиста</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// Функція для toggle dropdown
+function toggleDropdown(trackId) {
+    const dropdown = document.getElementById('dropdown-' + trackId);
+    
+    // Закриваємо всі інші dropdown
+    document.querySelectorAll('.dropdown-content').forEach(d => {
+        if (d.id !== 'dropdown-' + trackId) {
+            d.classList.remove('show');
+        }
+    });
+    
+    // Toggle поточний dropdown
+    dropdown.classList.toggle('show');
+}
+
+// Закриваємо dropdown при кліку поза ним
+window.onclick = function(event) {
+    if (!event.target.matches('.btn-add')) {
+        document.querySelectorAll('.dropdown-content').forEach(d => {
+            d.classList.remove('show');
+        });
+    }
+}
+</script>
+{% endblock %}

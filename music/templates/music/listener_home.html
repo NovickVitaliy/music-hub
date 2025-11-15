@@ -303,9 +303,12 @@
 <div class="listener-container">
     <!-- Welcome Section -->
     <div class="welcome-section">
-        <h1>🎧 Привіт, {{ user.username }}!</h1>
-        <p>Відкривайте нову музику та насолоджуйтесь улюбленими треками</p>
+    <h1>🎧 Привіт, {{ user.username }}!</h1>
+    <p>Відкривайте нову музику та насолоджуйтесь улюбленими треками</p>
+    <div style="margin-top: 1.5rem;">
+        <a href="{% url 'music:music_search' %}" class="create-btn">🔍 Шукати музику</a>
     </div>
+</div>
 
     <!-- Music Grid -->
     <div class="section-header">
@@ -320,7 +323,7 @@
                 {% cycle '#667eea 0%, #764ba2 100%' '#f093fb 0%, #f5576c 100%' '#43e97b 0%, #38f9d7 100%' '#fa709a 0%, #fee140 100%' '#a8edea 0%, #fed6e3 100%' '#ff9a9e 0%, #fecfef 100%' %});">
                 💿
                 <div class="play-overlay">
-                    <div class="play-btn">▶️</div>
+                    <a href=""><div class="play-btn">▶️</div></a>
                 </div>
             </div>
             <div class="music-info">
