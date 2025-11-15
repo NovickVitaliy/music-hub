@@ -1,0 +1,188 @@
+<!-- templates/music/album_list.html -->
+{% extends "music/base.html" %}
+{% block title %}Мої альбоми - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .albums-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .albums-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .album-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+
+    .album-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .album-icon {
+        font-size: 4rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .album-title {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .album-info {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .album-info span {
+        display: block;
+        margin-bottom: 0.3rem;
+    }
+
+    .album-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-view {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #5568d3;
+    }
+
+    .btn-edit {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #218838;
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #c82333;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .empty-state-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h2 {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #999;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="albums-container">
+    <div class="page-header">
+        <h1>💿 Мої альбоми</h1>
+        <a href="{% url 'music:album_create' %}" class="btn-primary">➕ Створити альбом</a>
+    </div>
+
+    {% if albums %}
+    <div class="albums-grid">
+        {% for album in albums %}
+        <div class="album-card">
+            <div class="album-icon">💿</div>
+            <h3 class="album-title">{{ album.title }}</h3>
+            <div class="album-info">
+                <span>🎵 Жанр: {{ album.genre.name|default:"Не вказано" }}</span>
+                <span>📅 Реліз: {{ album.release_date|date:"d.m.Y" }}</span>
+                <span>🎼 Треків: {{ album.tracks_count }}</span>
+            </div>
+            <div class="album-actions">
+                <a href="{% url 'music:album_detail' album.pk %}" class="btn btn-view">Переглянути</a>
+                <a href="{% url 'music:album_update' album.pk %}" class="btn btn-edit">Редагувати</a>
+                <a href="{% url 'music:album_delete' album.pk %}" class="btn btn-delete">Видалити</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📀</div>
+        <h2>У вас поки немає альбомів</h2>
+        <p>Створіть свій перший альбом та почніть додавати треки!</p>
+        <a href="{% url 'music:album_create' %}" class="btn-primary">Створити перший альбом</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,298 @@
+<!-- templates/music/album_detail.html -->
+{% extends "music/base.html" %}
+{% block title %}{{ album.title }} - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .album-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .album-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .album-meta {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        opacity: 0.95;
+    }
+
+    .album-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn {
+        padding: 0.7rem 1.5rem;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .btn-white {
+        background: white;
+        color: #667eea;
+    }
+
+    .btn-white:hover {
+        background: #f8f9fa;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+    }
+
+    .tracks-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.8rem;
+        color: #333;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        padding: 0.7rem 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .tracks-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .track-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.3s ease;
+    }
+
+    .track-item:hover {
+        background: #f8f9fa;
+    }
+
+    .track-item:last-child {
+        border-bottom: none;
+    }
+
+    .track-number {
+        font-weight: bold;
+        color: #667eea;
+        min-width: 40px;
+        font-size: 1.1rem;
+    }
+
+    .track-info {
+        flex: 1;
+    }
+
+    .track-title {
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .track-duration {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .track-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-small {
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-edit {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #218838;
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #c82333;
+    }
+
+    .empty-tracks {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #999;
+    }
+
+    .empty-tracks-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .description-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+
+    .description-section h3 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    .description-text {
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="{% url 'music:album_list' %}" class="back-link">← Назад до списку</a>
+
+    <div class="album-header">
+        <h1>💿 {{ album.title }}</h1>
+        <div class="album-meta">
+            <div class="album-meta-item">
+                <span>🎵</span>
+                <span>{{ album.genre.name|default:"Не вказано" }}</span>
+            </div>
+            <div class="album-meta-item">
+                <span>📅</span>
+                <span>{{ album.release_date|date:"d.m.Y" }}</span>
+            </div>
+            <div class="album-meta-item">
+                <span>🎼</span>
+                <span>{{ tracks.count }} треків</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'music:album_update' album.pk %}" class="btn btn-white">✏️ Редагувати</a>
+            <a href="{% url 'music:album_delete' album.pk %}" class="btn btn-danger">🗑️ Видалити</a>
+        </div>
+    </div>
+
+    {% if album.description %}
+    <div class="description-section">
+        <h3>Опис альбому</h3>
+        <p class="description-text">{{ album.description }}</p>
+    </div>
+    {% endif %}
+
+    <div class="tracks-section">
+        <div class="section-header">
+            <h2>Треки</h2>
+            <a href="{% url 'music:track_create' album.pk %}" class="btn-primary">➕ Додати трек</a>
+        </div>
+
+        {% if tracks %}
+        <ul class="tracks-list">
+            {% for track in tracks %}
+            <li class="track-item">
+                <div class="track-number">{{ track.track_number }}.</div>
+                <div class="track-info">
+                    <div class="track-title">{{ track.title }}</div>
+                    {% if track.duration %}
+<div class="track-duration">
+    ⏱️ {{ track.get_duration_display }}
+</div>
+{% endif %}
+                </div>
+                <div class="track-actions">
+                    <a href="{% url 'music:track_update' track.pk %}" class="btn-small btn-edit">Редагувати</a>
+                    <a href="{% url 'music:track_delete' track.pk %}" class="btn-small btn-delete">Видалити</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="empty-tracks">
+            <div class="empty-tracks-icon">🎵</div>
+            <p>У цьому альбомі поки немає треків</p>
+            <a href="{% url 'music:track_create' album.pk %}" class="btn-primary">Додати перший трек</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -156,6 +156,7 @@
         transition: all 0.3s ease;
         border: none;
         cursor: pointer;
+        display: inline-block;
     }
 
     .create-btn:hover {
@@ -175,7 +176,8 @@
         border-radius: 15px;
         box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         transition: all 0.3s ease;
-        cursor: pointer;
+        text-decoration: none;
+        display: block;
     }
 
     .playlist-card:hover {
@@ -250,6 +252,11 @@
         font-size: 0.9rem;
     }
 
+    .favorite-album {
+        color: #43e97b;
+        font-size: 0.85rem;
+    }
+
     .favorite-actions {
         display: flex;
         gap: 1rem;
@@ -263,6 +270,17 @@
 
     .action-icon:hover {
         transform: scale(1.2);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #999;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
     }
 
     @media (max-width: 768px) {
@@ -289,187 +307,98 @@
         <p>Відкривайте нову музику та насолоджуйтесь улюбленими треками</p>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs-container">
-        <button class="tab-btn active">Рекомендації</button>
-        <button class="tab-btn">Нові релізи</button>
-        <button class="tab-btn">Популярне</button>
-        <button class="tab-btn">Жанри</button>
-        <button class="tab-btn">Артисти</button>
-    </div>
-
     <!-- Music Grid -->
     <div class="section-header">
         <h2 class="section-title">Рекомендовано для вас</h2>
     </div>
+    
+    {% if albums %}
     <div class="music-grid">
+        {% for album in albums %}
         <div class="music-card">
-            <div class="music-cover">
-                🎵
+            <div class="music-cover" style="background: linear-gradient(135deg, 
+                {% cycle '#667eea 0%, #764ba2 100%' '#f093fb 0%, #f5576c 100%' '#43e97b 0%, #38f9d7 100%' '#fa709a 0%, #fee140 100%' '#a8edea 0%, #fed6e3 100%' '#ff9a9e 0%, #fecfef 100%' %});">
+                💿
                 <div class="play-overlay">
                     <div class="play-btn">▶️</div>
                 </div>
             </div>
             <div class="music-info">
-                <div class="music-title">Summer Nights</div>
-                <div class="music-artist">DJ Sunshine</div>
+                <div class="music-title">{{ album.title }}</div>
+                <div class="music-artist">{{ album.artist.stage_name|default:album.artist.username }}</div>
             </div>
         </div>
-
-        <div class="music-card">
-            <div class="music-cover" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                🎸
-                <div class="play-overlay">
-                    <div class="play-btn">▶️</div>
-                </div>
-            </div>
-            <div class="music-info">
-                <div class="music-title">Rock Anthem</div>
-                <div class="music-artist">Thunder Band</div>
-            </div>
-        </div>
-
-        <div class="music-card">
-            <div class="music-cover" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                🎹
-                <div class="play-overlay">
-                    <div class="play-btn">▶️</div>
-                </div>
-            </div>
-            <div class="music-info">
-                <div class="music-title">Piano Dreams</div>
-                <div class="music-artist">Classical Joe</div>
-            </div>
-        </div>
-
-        <div class="music-card">
-            <div class="music-cover" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                🎤
-                <div class="play-overlay">
-                    <div class="play-btn">▶️</div>
-                </div>
-            </div>
-            <div class="music-info">
-                <div class="music-title">Hip Hop Flow</div>
-                <div class="music-artist">MC Rhythm</div>
-            </div>
-        </div>
-
-        <div class="music-card">
-            <div class="music-cover" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
-                🎺
-                <div class="play-overlay">
-                    <div class="play-btn">▶️</div>
-                </div>
-            </div>
-            <div class="music-info">
-                <div class="music-title">Jazz Vibes</div>
-                <div class="music-artist">Smooth Jazz Trio</div>
-            </div>
-        </div>
-
-        <div class="music-card">
-            <div class="music-cover" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
-                🎼
-                <div class="play-overlay">
-                    <div class="play-btn">▶️</div>
-                </div>
-            </div>
-            <div class="music-info">
-                <div class="music-title">Electronic Pulse</div>
-                <div class="music-artist">Synth Master</div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🎵</div>
+        <p>Поки немає доступних альбомів</p>
+    </div>
+    {% endif %}
 
     <!-- Playlists Section -->
     <div class="playlists-section">
         <div class="section-header">
             <h2 class="section-title">Мої плейлисти</h2>
-            <button class="create-btn">+ Створити плейлист</button>
+            <a href="{% url 'music:playlist_create' %}" class="create-btn">+ Створити плейлист</a>
         </div>
+        
+        {% if playlists %}
         <div class="playlist-grid">
-            <div class="playlist-card">
-                <div class="playlist-icon">❤️</div>
-                <div class="playlist-name">Улюблені</div>
-                <div class="playlist-info">42 треки • 2 год 35 хв</div>
-            </div>
-
-            <div class="playlist-card">
-                <div class="playlist-icon">🏃</div>
-                <div class="playlist-name">Для тренувань</div>
-                <div class="playlist-info">28 треків • 1 год 45 хв</div>
-            </div>
-
-            <div class="playlist-card">
-                <div class="playlist-icon">😌</div>
-                <div class="playlist-name">Релакс</div>
-                <div class="playlist-info">35 треків • 2 год 10 хв</div>
-            </div>
-
-            <div class="playlist-card">
-                <div class="playlist-icon">🎉</div>
-                <div class="playlist-name">Вечірка</div>
-                <div class="playlist-info">50 треків • 3 год 20 хв</div>
-            </div>
+            {% for playlist in playlists %}
+            <a href="{% url 'music:playlist_detail' playlist.pk %}" class="playlist-card">
+                <div class="playlist-icon">
+                    {% if playlist.name == "Улюблені" or "Favorite" in playlist.name %}❤️
+                    {% elif "Тренування" in playlist.name or "Workout" in playlist.name %}🏃
+                    {% elif "Релакс" in playlist.name or "Relax" in playlist.name %}😌
+                    {% elif "Вечірка" in playlist.name or "Party" in playlist.name %}🎉
+                    {% else %}🎵{% endif %}
+                </div>
+                <div class="playlist-name">{{ playlist.name }}</div>
+                <div class="playlist-info">
+                    {{ playlist.tracks_count }} треків • {{ playlist.get_duration_display }}
+                </div>
+            </a>
+            {% endfor %}
         </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📀</div>
+            <p>У вас ще немає плейлистів</p>
+            <a href="{% url 'music:playlist_create' %}" class="create-btn">Створити перший плейлист</a>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Favorites Section -->
     <div class="favorites-section">
-        <h2 class="section-title">Нещодавно прослухане</h2>
+        <div class="section-header">
+            <h2 class="section-title">Улюблені треки</h2>
+            <a href="{% url 'music:favorites_list' %}" class="create-btn">Переглянути всі</a>
+        </div>
         
-        <div class="favorite-item">
-            <div class="favorite-cover">🎵</div>
-            <div class="favorite-details">
-                <div class="favorite-title">Midnight Jazz</div>
-                <div class="favorite-artist">Cool Cats Ensemble</div>
+        {% if favorites %}
+            {% for favorite in favorites %}
+            <div class="favorite-item">
+                <div class="favorite-cover">🎵</div>
+                <div class="favorite-details">
+                    <div class="favorite-title">{{ favorite.track.title }}</div>
+                    <div class="favorite-album">💿 {{ favorite.track.album.title }}</div>
+                    <div class="favorite-artist">{{ favorite.track.album.artist.stage_name|default:favorite.track.album.artist.username }}</div>
+                </div>
+                <div class="favorite-actions">
+                    <a href="{% url 'music:toggle_favorite' favorite.track.pk %}" class="action-icon" title="Видалити з улюблених">❤️</a>
+                    <span class="action-icon" title="Відтворити">▶️</span>
+                </div>
             </div>
-            <div class="favorite-actions">
-                <span class="action-icon">❤️</span>
-                <span class="action-icon">➕</span>
-                <span class="action-icon">▶️</span>
-            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">❤️</div>
+            <p>У вас ще немає улюблених треків</p>
         </div>
-
-        <div class="favorite-item">
-            <div class="favorite-cover" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🎸</div>
-            <div class="favorite-details">
-                <div class="favorite-title">Electric Storm</div>
-                <div class="favorite-artist">Rock Legends</div>
-            </div>
-            <div class="favorite-actions">
-                <span class="action-icon">❤️</span>
-                <span class="action-icon">➕</span>
-                <span class="action-icon">▶️</span>
-            </div>
-        </div>
-
-        <div class="favorite-item">
-            <div class="favorite-cover" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">🎹</div>
-            <div class="favorite-details">
-                <div class="favorite-title">Ocean Waves</div>
-                <div class="favorite-artist">Nature Sounds</div>
-            </div>
-            <div class="favorite-actions">
-                <span class="action-icon">❤️</span>
-                <span class="action-icon">➕</span>
-                <span class="action-icon">▶️</span>
-            </div>
-        </div>
-
-        <div class="favorite-item">
-            <div class="favorite-cover" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🎤</div>
-            <div class="favorite-details">
-                <div class="favorite-title">Urban Beats</div>
-                <div class="favorite-artist">City Rappers</div>
-            </div>
-            <div class="favorite-actions">
-                <span class="action-icon">❤️</span>
-                <span class="action-icon">➕</span>
-                <span class="action-icon">▶️</span>
-            </div>
-        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

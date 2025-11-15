@@ -1,0 +1,260 @@
+<!-- templates/music/favorites_list.html -->
+{% extends "music/base.html" %}
+{% block title %}Улюблені треки - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .favorites-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(240, 147, 251, 0.3);
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+
+    .favorites-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .favorite-item {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+    .favorite-item:hover {
+        background: #f8f9fa;
+    }
+
+    .favorite-item:last-child {
+        border-bottom: none;
+    }
+
+    .favorite-cover {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-right: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .favorite-details {
+        flex: 1;
+    }
+
+    .favorite-title {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.3rem;
+        font-size: 1.2rem;
+    }
+
+    .favorite-album {
+        color: #667eea;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .favorite-artist {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .favorite-duration {
+        color: #999;
+        font-size: 0.9rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .favorite-actions {
+        display: flex;
+        gap: 1rem;
+        flex-shrink: 0;
+    }
+
+    .action-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: 2px solid transparent;
+    }
+
+    .action-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .btn-favorite {
+        background: #ffebee;
+        color: #f5576c;
+    }
+
+    .btn-favorite:hover {
+        background: #f5576c;
+        color: white;
+    }
+
+    .btn-play {
+        background: #e8f5e9;
+        color: #43e97b;
+    }
+
+    .btn-play:hover {
+        background: #43e97b;
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h2 {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #999;
+        margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(67, 233, 123, 0.4);
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #f5576c;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .favorite-item {
+            flex-wrap: wrap;
+        }
+
+        .favorite-cover {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+
+        .favorite-actions {
+            margin-top: 1rem;
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="favorites-container">
+    <a href="{% url 'music:listener_home' %}" class="back-link">← Назад на головну</a>
+
+    <div class="page-header">
+        <h1>❤️ Улюблені треки</h1>
+        <p>{{ favorites.count }} треків у вашій колекції</p>
+    </div>
+
+    <div class="favorites-section">
+        {% if favorites %}
+            {% for favorite in favorites %}
+            <div class="favorite-item">
+                <div class="favorite-cover" style="background: linear-gradient(135deg, 
+                    {% cycle '#667eea 0%, #764ba2 100%' '#f093fb 0%, #f5576c 100%' '#43e97b 0%, #38f9d7 100%' '#fa709a 0%, #fee140 100%' %});">
+                    🎵
+                </div>
+                <div class="favorite-details">
+                    <div class="favorite-title">{{ favorite.track.title }}</div>
+                    <div class="favorite-album">💿 {{ favorite.track.album.title }}</div>
+                    <div class="favorite-artist">
+                        {{ favorite.track.album.artist.stage_name|default:favorite.track.album.artist.username }}
+                    </div>
+                </div>
+                {% if favorite.track.duration %}
+                <div class="favorite-duration">
+                    ⏱️ {{ favorite.track.get_duration_display }}
+                </div>
+                {% endif %}
+                <div class="favorite-actions">
+                    <a href="{% url 'music:toggle_favorite' favorite.track.pk %}" 
+                       class="action-btn btn-favorite" 
+                       title="Видалити з улюблених">
+                        ❤️
+                    </a>
+                    <div class="action-btn btn-play" title="Відтворити">
+                        ▶️
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">💔</div>
+            <h2>Список улюблених порожній</h2>
+            <p>Додайте треки до улюблених, щоб мати швидкий доступ до них</p>
+            <a href="{% url 'music:listener_home' %}" class="btn-primary">Відкрити музику</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

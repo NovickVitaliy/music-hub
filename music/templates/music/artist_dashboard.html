@@ -163,21 +163,21 @@
         font-size: 0.9rem;
     }
 
-    .recent-item-status {
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
+    .recent-item-album {
+        color: #667eea;
         font-size: 0.85rem;
-        font-weight: 600;
+        margin-top: 0.2rem;
     }
 
-    .status-published {
-        background: #d4edda;
-        color: #155724;
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #999;
     }
 
-    .status-draft {
-        background: #fff3cd;
-        color: #856404;
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
     }
 
     @media (max-width: 768px) {
@@ -196,7 +196,7 @@
 <div class="dashboard-container">
     <!-- Welcome Section -->
     <div class="welcome-section">
-        <h1>🎤 Вітаємо, {{ user.username }}!</h1>
+        <h1>🎤 Вітаємо, {{ user.stage_name|default:user.username }}!</h1>
         <p>Керуйте своєю музичною кар'єрою з панелі артиста</p>
     </div>
 
@@ -205,22 +205,22 @@
         <div class="stat-card">
             <div class="stat-icon">🎵</div>
             <div class="stat-label">Загальна кількість треків</div>
-            <div class="stat-value">24</div>
+            <div class="stat-value">{{ total_tracks }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">💿</div>
             <div class="stat-label">Альбомів</div>
-            <div class="stat-value">3</div>
+            <div class="stat-value">{{ total_albums }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">👥</div>
             <div class="stat-label">Підписників</div>
-            <div class="stat-value">1,234</div>
+            <div class="stat-value">{{ followers|default:"0" }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">▶️</div>
             <div class="stat-label">Прослуховувань</div>
-            <div class="stat-value">45.6K</div>
+            <div class="stat-value">{{ plays|default:"0" }}</div>
         </div>
     </div>
 
@@ -229,16 +229,16 @@
         <h2 class="section-title">Швидкі дії</h2>
         <div class="actions-grid">
             <div class="action-card">
-                <div class="action-icon">🎵</div>
-                <h3>Завантажити трек</h3>
-                <p>Додайте новий трек до своєї колекції</p>
-                <a href="#" class="action-btn">Завантажити</a>
-            </div>
-            <div class="action-card">
                 <div class="action-icon">💿</div>
                 <h3>Створити альбом</h3>
                 <p>Об'єднайте треки в альбом</p>
-                <a href="#" class="action-btn">Створити</a>
+                <a href="{% url 'music:album_create' %}" class="action-btn">Створити</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">📀</div>
+                <h3>Мої альбоми</h3>
+                <p>Переглянути та керувати альбомами</p>
+                <a href="{% url 'music:album_list' %}" class="action-btn">Переглянути</a>
             </div>
             <div class="action-card">
                 <div class="action-icon">📊</div>
@@ -256,7 +256,7 @@
                 <div class="action-icon">👤</div>
                 <h3>Профіль</h3>
                 <p>Редагуйте свій профіль артиста</p>
-                <a href="#" class="action-btn">Редагувати</a>
+                <a href="{% url 'music:profile' %}" class="action-btn">Редагувати</a>
             </div>
             <div class="action-card">
                 <div class="action-icon">💰</div>
@@ -270,27 +270,24 @@
     <!-- Recent Tracks -->
     <div class="recent-section">
         <h2 class="section-title">Останні треки</h2>
-        <div class="recent-item">
-            <div class="recent-item-info">
-                <h4>Summer Vibes</h4>
-                <p>Завантажено 2 дні тому</p>
+        {% if recent_tracks %}
+            {% for track in recent_tracks %}
+            <div class="recent-item">
+                <div class="recent-item-info">
+                    <h4>{{ track.title }}</h4>
+                    <p class="recent-item-album">💿 {{ track.album.title }}</p>
+                    <p>Додано {{ track.created_at|timesince }} тому</p>
+                </div>
+                <a href="{% url 'music:album_detail' track.album.pk %}" class="action-btn">Переглянути</a>
             </div>
-            <span class="recent-item-status status-published">Опубліковано</span>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🎵</div>
+            <p>У вас ще немає треків. Створіть альбом та додайте треки!</p>
+            <a href="{% url 'music:album_create' %}" class="action-btn">Створити альбом</a>
         </div>
-        <div class="recent-item">
-            <div class="recent-item-info">
-                <h4>Midnight Dreams</h4>
-                <p>Завантажено 5 днів тому</p>
-            </div>
-            <span class="recent-item-status status-published">Опубліковано</span>
-        </div>
-        <div class="recent-item">
-            <div class="recent-item-info">
-                <h4>Urban Beat (Demo)</h4>
-                <p>Завантажено тиждень тому</p>
-            </div>
-            <span class="recent-item-status status-draft">Чернетка</span>
-        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
