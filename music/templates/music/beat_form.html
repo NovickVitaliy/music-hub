@@ -1,0 +1,230 @@
+<!-- templates/music/beat_form.html -->
+{% extends "music/base.html" %}
+{% block title %}{{ action }} біт - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 700px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .form-card {
+        background: white;
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .form-header h1 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-header p {
+        color: #666;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #f093fb;
+        box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .form-check-label {
+        cursor: pointer;
+        color: #666;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 1rem;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+    }
+
+    .btn-cancel {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .btn-cancel:hover {
+        background: #e0e0e0;
+    }
+
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0 0 0;
+    }
+
+    .errorlist li {
+        color: #dc3545;
+        font-size: 0.9rem;
+    }
+
+    .form-group.error .form-control {
+        border-color: #dc3545;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #f093fb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <a href="{% if beat %}{% url 'music:beat_detail' beat.pk %}{% else %}{% url 'music:beat_list' %}{% endif %}" class="back-link">← Назад</a>
+
+    <div class="form-card">
+        <div class="form-header">
+            <h1>{{ action }} біт</h1>
+            <p>{% if beat %}Редагуйте інформацію про біт{% else %}Додайте новий біт до портфоліо{% endif %}</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group {% if form.title.errors %}error{% endif %}">
+                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                {{ form.title }}
+                {{ form.title.errors }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group {% if form.genre.errors %}error{% endif %}">
+                    <label for="{{ form.genre.id_for_label }}">{{ form.genre.label }}</label>
+                    {{ form.genre }}
+                    {{ form.genre.errors }}
+                </div>
+
+                <div class="form-group {% if form.bpm.errors %}error{% endif %}">
+                    <label for="{{ form.bpm.id_for_label }}">{{ form.bpm.label }}</label>
+                    {{ form.bpm }}
+                    {{ form.bpm.errors }}
+                </div>
+            </div>
+
+            <div class="form-group {% if form.price.errors %}error{% endif %}">
+                <label for="{{ form.price.id_for_label }}">{{ form.price.label }}</label>
+                {{ form.price }}
+                {{ form.price.errors }}
+            </div>
+
+            <div class="form-group {% if form.description.errors %}error{% endif %}">
+                <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                {{ form.description }}
+                {{ form.description.errors }}
+            </div>
+
+            <div class="form-check">
+                {{ form.is_available }}
+                <label for="{{ form.is_available.id_for_label }}" class="form-check-label">
+                    {{ form.is_available.label }}
+                </label>
+            </div>
+
+            <div class="form-check">
+                {{ form.is_exclusive }}
+                <label for="{{ form.is_exclusive.id_for_label }}" class="form-check-label">
+                    {{ form.is_exclusive.label }}
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-submit">{{ action }}</button>
+                <a href="{% if beat %}{% url 'music:beat_detail' beat.pk %}{% else %}{% url 'music:beat_list' %}{% endif %}" class="btn btn-cancel">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

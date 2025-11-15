@@ -2,7 +2,7 @@
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Contract, Playlist, User, Album, Track, Genre
+from .models import Beat, Collaboration, Contract, Playlist, User, Album, Track, Genre
 
 class CustomUserCreationForm(UserCreationForm):
     """Форма реєстрації з додатковими полями"""
@@ -260,3 +260,128 @@ class ContractForm(forms.ModelForm):
         if commit:
             contract.save()
         return contract
+    
+class BeatForm(forms.ModelForm):
+    """Форма для створення/редагування біту"""
+    
+    class Meta:
+        model = Beat
+        fields = ['title', 'genre', 'bpm', 'price', 'description', 'is_available', 'is_exclusive']
+        labels = {
+            'title': 'Назва біту',
+            'genre': 'Жанр',
+            'bpm': 'BPM',
+            'price': 'Ціна ($)',
+            'description': 'Опис',
+            'is_available': 'Доступний для покупки',
+            'is_exclusive': 'Ексклюзивний',
+        }
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Введіть назву біту'
+            }),
+            'genre': forms.Select(attrs={'class': 'form-control'}),
+            'bpm': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '40',
+                'max': '200',
+                'placeholder': '120'
+            }),
+            'price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+                'placeholder': '50.00'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Опишіть ваш біт...'
+            }),
+            'is_available': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_exclusive': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+
+class CollaborationForm(forms.ModelForm):
+    """Форма для створення/редагування співпраці"""
+    
+    class Meta:
+        model = Collaboration
+        fields = ['artist', 'beat', 'project_name', 'status', 'producer_share', 
+                  'artist_share', 'deadline', 'description', 'notes']
+        labels = {
+            'artist': 'Артист',
+            'beat': 'Біт',
+            'project_name': 'Назва проєкту',
+            'status': 'Статус',
+            'producer_share': 'Частка продюсера (%)',
+            'artist_share': 'Частка артиста (%)',
+            'deadline': 'Дедлайн',
+            'description': 'Опис',
+            'notes': 'Примітки',
+        }
+        widgets = {
+            'artist': forms.Select(attrs={'class': 'form-control'}),
+            'beat': forms.Select(attrs={'class': 'form-control'}),
+            'project_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Назва проєкту'
+            }),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+            'producer_share': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+                'max': '100',
+                'value': '50'
+            }),
+            'artist_share': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+                'max': '100',
+                'value': '50'
+            }),
+            'deadline': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        producer = kwargs.pop('producer', None)
+        super().__init__(*args, **kwargs)
+        
+        # Показуємо тільки артистів
+        self.fields['artist'].queryset = User.objects.filter(role='artist')
+        self.fields['artist'].label_from_instance = lambda obj: (
+            f"🎤 {obj.stage_name} (@{obj.username})" if obj.stage_name 
+            else f"🎤 {obj.username}"
+        )
+        
+        # Показуємо тільки біти продюсера
+        if producer:
+            self.fields['beat'].queryset = Beat.objects.filter(producer=producer, is_available=True)
+            self.fields['beat'].required = False
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        producer_share = cleaned_data.get('producer_share', 0)
+        artist_share = cleaned_data.get('artist_share', 0)
+        
+        if producer_share + artist_share != 100:
+            raise forms.ValidationError(
+                'Сума часток продюсера та артиста повинна дорівнювати 100%'
+            )
+        
+        return cleaned_data

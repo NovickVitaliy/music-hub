@@ -6,8 +6,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count, Sum
-from .forms import ContractForm, CustomUserCreationForm, AlbumForm, TrackForm
-from .models import Contract, User, Album, Genre, Track
+from .forms import BeatForm, CollaborationForm, ContractForm, CustomUserCreationForm, AlbumForm, TrackForm
+from .models import Beat, Collaboration, Contract, User, Album, Genre, Track
 from .models import User, Album, Genre, Track, Playlist, Favorite
 from .forms import CustomUserCreationForm, AlbumForm, TrackForm, PlaylistForm
 from django.db import models
@@ -659,7 +659,7 @@ def artist_search(request):
     if request.user.role != 'label_manager':
         messages.error(request, 'У вас немає доступу до цієї сторінки')
         return redirect('music:dashboard')
-    
+
     query = request.GET.get('q', '')
     
     # Отримуємо артистів, з якими вже є активні контракти
@@ -695,3 +695,194 @@ def artist_search(request):
         'contracted_artist_ids': list(contracted_artist_ids),
     }
     return render(request, 'music/artist_search.html', context)
+
+# ==================== PRODUCER DASHBOARD ====================
+@login_required
+def producer_dashboard(request):
+    """Панель продюсера"""
+    if request.user.role != 'producer':
+        messages.error(request, 'У вас немає доступу до цієї сторінки')
+        return redirect('music:dashboard')
+    
+    beats = Beat.objects.filter(producer=request.user)
+    collabs = Collaboration.objects.filter(producer=request.user)
+    
+    total_beats = beats.count()
+    total_collabs = collabs.filter(status__in=['active', 'recording', 'mixing']).count()
+    total_plays = beats.aggregate(Sum('plays_count'))['plays_count__sum'] or 0
+    
+    active_projects = collabs.filter(status__in=['active', 'recording', 'mixing']).order_by('deadline')[:3]
+    recent_beats = beats.order_by('-created_at')[:6]
+    
+    context = {
+        'total_beats': total_beats,
+        'total_collabs': total_collabs,
+        'total_plays': total_plays,
+        'active_projects': active_projects,
+        'recent_beats': recent_beats,
+    }
+    return render(request, 'music/producer_dashboard.html', context)
+
+
+# ==================== BEAT CRUD ====================
+@login_required
+def beat_list(request):
+    """Список бітів продюсера"""
+    if request.user.role != 'producer':
+        messages.error(request, 'У вас немає доступу до цієї сторінки')
+        return redirect('music:dashboard')
+    
+    beats = Beat.objects.filter(producer=request.user).order_by('-created_at')
+    
+    context = {'beats': beats}
+    return render(request, 'music/beat_list.html', context)
+
+
+@login_required
+def beat_create(request):
+    """Створення біту"""
+    if request.user.role != 'producer':
+        messages.error(request, 'У вас немає доступу до цієї сторінки')
+        return redirect('music:dashboard')
+    
+    if request.method == 'POST':
+        form = BeatForm(request.POST)
+        if form.is_valid():
+            beat = form.save(commit=False)
+            beat.producer = request.user
+            beat.save()
+            messages.success(request, f'Біт "{beat.title}" успішно створено!')
+            return redirect('music:beat_detail', pk=beat.pk)
+    else:
+        form = BeatForm()
+    
+    context = {'form': form, 'action': 'Створити'}
+    return render(request, 'music/beat_form.html', context)
+
+
+@login_required
+def beat_detail(request, pk):
+    """Детальна інформація про біт"""
+    beat = get_object_or_404(Beat, pk=pk, producer=request.user)
+    
+    context = {'beat': beat}
+    return render(request, 'music/beat_detail.html', context)
+
+
+@login_required
+def beat_update(request, pk):
+    """Редагування біту"""
+    beat = get_object_or_404(Beat, pk=pk, producer=request.user)
+    
+    if request.method == 'POST':
+        form = BeatForm(request.POST, instance=beat)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Біт "{beat.title}" оновлено!')
+            return redirect('music:beat_detail', pk=beat.pk)
+    else:
+        form = BeatForm(instance=beat)
+    
+    context = {
+        'form': form,
+        'beat': beat,
+        'action': 'Оновити'
+    }
+    return render(request, 'music/beat_form.html', context)
+
+
+@login_required
+def beat_delete(request, pk):
+    """Видалення біту"""
+    beat = get_object_or_404(Beat, pk=pk, producer=request.user)
+    
+    if request.method == 'POST':
+        beat_title = beat.title
+        beat.delete()
+        messages.success(request, f'Біт "{beat_title}" видалено!')
+        return redirect('music:beat_list')
+    
+    context = {'beat': beat}
+    return render(request, 'music/beat_confirm_delete.html', context)
+
+
+# ==================== COLLABORATION CRUD ====================
+@login_required
+def collaboration_list(request):
+    """Список співпраць"""
+    if request.user.role != 'producer':
+        messages.error(request, 'У вас немає доступу до цієї сторінки')
+        return redirect('music:dashboard')
+    
+    collabs = Collaboration.objects.filter(producer=request.user).select_related('artist', 'beat').order_by('-created_at')
+    
+    context = {'collabs': collabs}
+    return render(request, 'music/collaboration_list.html', context)
+
+
+@login_required
+def collaboration_create(request):
+    """Створення співпраці"""
+    if request.user.role != 'producer':
+        messages.error(request, 'У вас немає доступу до цієї сторінки')
+        return redirect('music:dashboard')
+    
+    if request.method == 'POST':
+        form = CollaborationForm(request.POST, producer=request.user)
+        if form.is_valid():
+            collab = form.save(commit=False)
+            collab.producer = request.user
+            collab.save()
+            messages.success(request, f'Проєкт "{collab.project_name}" створено!')
+            return redirect('music:collaboration_detail', pk=collab.pk)
+    else:
+        form = CollaborationForm(producer=request.user)
+    
+    context = {'form': form, 'action': 'Створити'}
+    return render(request, 'music/collaboration_form.html', context)
+
+
+@login_required
+def collaboration_detail(request, pk):
+    """Детальна інформація про співпрацю"""
+    collab = get_object_or_404(Collaboration, pk=pk, producer=request.user)
+    
+    context = {'collab': collab}
+    return render(request, 'music/collaboration_detail.html', context)
+
+
+@login_required
+def collaboration_update(request, pk):
+    """Редагування співпраці"""
+    collab = get_object_or_404(Collaboration, pk=pk, producer=request.user)
+    
+    if request.method == 'POST':
+        form = CollaborationForm(request.POST, instance=collab, producer=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Проєкт "{collab.project_name}" оновлено!')
+            return redirect('music:collaboration_detail', pk=collab.pk)
+    else:
+        form = CollaborationForm(instance=collab, producer=request.user)
+    
+    context = {
+        'form': form,
+        'collab': collab,
+        'action': 'Оновити'
+    }
+    return render(request, 'music/collaboration_form.html', context)
+
+
+@login_required
+def collaboration_delete(request, pk):
+    """Видалення співпраці"""
+    collab = get_object_or_404(Collaboration, pk=pk, producer=request.user)
+    
+    if request.method == 'POST':
+        project_name = collab.project_name
+        collab.delete()
+        messages.success(request, f'Проєкт "{project_name}" видалено!')
+        return redirect('music:collaboration_list')
+    
+    context = {'collab': collab}
+    return render(request, 'music/collaboration_confirm_delete.html', context)

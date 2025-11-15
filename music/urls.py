@@ -63,4 +63,17 @@ urlpatterns = [
     path('contracts/<int:pk>/delete/', views.contract_delete, name='contract_delete'),
     # Artist Search for Contracts
     path('artists/search/', views.artist_search, name='artist_search'),
+    # Beat CRUD
+    path('beats/', views.beat_list, name='beat_list'),
+    path('beats/create/', views.beat_create, name='beat_create'),
+    path('beats/<int:pk>/', views.beat_detail, name='beat_detail'),
+    path('beats/<int:pk>/edit/', views.beat_update, name='beat_update'),
+    path('beats/<int:pk>/delete/', views.beat_delete, name='beat_delete'),
+    
+    # Collaboration CRUD
+    path('collaborations/', views.collaboration_list, name='collaboration_list'),
+    path('collaborations/create/', views.collaboration_create, name='collaboration_create'),
+    path('collaborations/<int:pk>/', views.collaboration_detail, name='collaboration_detail'),
+    path('collaborations/<int:pk>/edit/', views.collaboration_update, name='collaboration_update'),
+    path('collaborations/<int:pk>/delete/', views.collaboration_delete, name='collaboration_delete'),
 ]

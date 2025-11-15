@@ -173,3 +173,88 @@ class Contract(models.Model):
             self.status = 'expiring'
         
         super().save(*args, **kwargs)
+
+class Beat(models.Model):
+    """Біти продюсерів"""
+    GENRE_CHOICES = (
+        ('trap', 'Trap'),
+        ('lofi', 'Lo-Fi'),
+        ('hiphop', 'Hip-Hop'),
+        ('rock', 'Rock'),
+        ('electronic', 'Electronic'),
+        ('jazz', 'Jazz'),
+        ('rnb', 'R&B'),
+        ('pop', 'Pop'),
+    )
+    
+    producer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='beats', limit_choices_to={'role': 'producer'})
+    title = models.CharField(max_length=200)
+    genre = models.CharField(max_length=20, choices=GENRE_CHOICES)
+    bpm = models.PositiveIntegerField(help_text="Beats per minute")
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Ціна в доларах")
+    description = models.TextField(blank=True)
+    
+    # Файл біту (опціонально)
+    audio_file = models.FileField(upload_to='beats/', null=True, blank=True)
+    
+    # Статистика
+    plays_count = models.PositiveIntegerField(default=0)
+    downloads_count = models.PositiveIntegerField(default=0)
+    
+    # Доступність
+    is_available = models.BooleanField(default=True, help_text="Чи доступний біт для покупки")
+    is_exclusive = models.BooleanField(default=False, help_text="Ексклюзивний біт")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} - {self.producer.stage_name or self.producer.username}"
+
+
+class Collaboration(models.Model):
+    """Співпраці між продюсерами та артистами"""
+    STATUS_CHOICES = (
+        ('pending', 'Очікує підтвердження'),
+        ('active', 'Активна'),
+        ('recording', 'Запис вокалу'),
+        ('mixing', 'Зведення'),
+        ('completed', 'Завершено'),
+        ('cancelled', 'Скасовано'),
+    )
+    
+    producer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='producer_collabs', limit_choices_to={'role': 'producer'})
+    artist = models.ForeignKey(User, on_delete=models.CASCADE, related_name='artist_collabs', limit_choices_to={'role': 'artist'})
+    beat = models.ForeignKey(Beat, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    project_name = models.CharField(max_length=200)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    description = models.TextField(blank=True)
+    
+    # Умови співпраці
+    producer_share = models.DecimalField(max_digits=5, decimal_places=2, help_text="% продюсера")
+    artist_share = models.DecimalField(max_digits=5, decimal_places=2, help_text="% артиста")
+    
+    deadline = models.DateField(null=True, blank=True)
+    completed_date = models.DateField(null=True, blank=True)
+    
+    notes = models.TextField(blank=True, help_text="Додаткові примітки")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.project_name} - {self.producer.stage_name or self.producer.username} x {self.artist.stage_name or self.artist.username}"
+    
+    def is_overdue(self):
+        """Чи прострочена колаборація"""
+        from datetime import date
+        if self.deadline and self.status in ['pending', 'active', 'recording', 'mixing']:
+            return date.today() > self.deadline
+        return False

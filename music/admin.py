@@ -77,6 +77,23 @@ class ContractAdmin(admin.ModelAdmin):
         return obj.months_remaining()
     months_remaining.short_description = 'Місяців залишилось'
 
+from .models import User, Genre, Album, Track, Playlist, Favorite, Contract, Beat, Collaboration
+
+@admin.register(Beat)
+class BeatAdmin(admin.ModelAdmin):
+    list_display = ('title', 'producer', 'genre', 'bpm', 'price', 'plays_count', 'is_available', 'created_at')
+    list_filter = ('genre', 'is_available', 'is_exclusive', 'created_at')
+    search_fields = ('title', 'producer__username', 'producer__stage_name')
+    ordering = ('-created_at',)
+
+
+@admin.register(Collaboration)
+class CollaborationAdmin(admin.ModelAdmin):
+    list_display = ('project_name', 'producer', 'artist', 'status', 'deadline', 'created_at')
+    list_filter = ('status', 'created_at', 'deadline')
+    search_fields = ('project_name', 'producer__username', 'artist__username')
+    ordering = ('-created_at',)
+
 # Налаштування заголовків адмін панелі
 admin.site.site_header = 'MusicHub Ukraine - Адміністрування'
 admin.site.site_title = 'MusicHub Admin'

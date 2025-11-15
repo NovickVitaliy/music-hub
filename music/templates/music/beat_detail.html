@@ -1,0 +1,222 @@
+{% extends "music/base.html" %}
+{% block title %}{{ beat.title }} - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .beat-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(240, 147, 251, 0.3);
+    }
+
+    .beat-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .beat-meta {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        opacity: 0.95;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn {
+        padding: 0.7rem 1.5rem;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .btn-white {
+        background: white;
+        color: #f093fb;
+    }
+
+    .btn-white:hover {
+        background: #f8f9fa;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+    }
+
+    .info-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        background: #f8f9fa;
+        padding: 1.2rem;
+        border-radius: 10px;
+    }
+
+    .info-label {
+        color: #999;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        color: #333;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .description-box {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        line-height: 1.6;
+        color: #666;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #f093fb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .badge-available {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .badge-exclusive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="{% url 'music:beat_list' %}" class="back-link">← Назад до списку</a>
+
+    <div class="beat-header">
+        {% if beat.is_exclusive %}
+        <div class="badge badge-exclusive">⭐ Ексклюзивний</div>
+        {% elif beat.is_available %}
+        <div class="badge badge-available">✓ Доступний</div>
+        {% endif %}
+        
+        <h1>🎹 {{ beat.title }}</h1>
+        <div class="beat-meta">
+            <div class="meta-item">
+                <span>🎵</span>
+                <span>{{ beat.get_genre_display }}</span>
+            </div>
+            <div class="meta-item">
+                <span>⏱️</span>
+                <span>{{ beat.bpm }} BPM</span>
+            </div>
+            {% if beat.price %}
+            <div class="meta-item">
+                <span>💰</span>
+                <span>${{ beat.price }}</span>
+            </div>
+            {% endif %}
+            <div class="meta-item">
+                <span>📅</span>
+                <span>{{ beat.created_at|date:"d.m.Y" }}</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'music:beat_update' beat.pk %}" class="btn btn-white">✏️ Редагувати</a>
+            <a href="{% url 'music:beat_delete' beat.pk %}" class="btn btn-danger">🗑️ Видалити</a>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <h2 class="section-title">Статистика</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Прослуховувань</div>
+                <div class="info-value">{{ beat.plays_count }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Завантажень</div>
+                <div class="info-value">{{ beat.downloads_count }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">BPM</div>
+                <div class="info-value">{{ beat.bpm }}</div>
+            </div>
+            {% if beat.price %}
+            <div class="info-item">
+                <div class="info-label">Ціна</div>
+                <div class="info-value">${{ beat.price }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if beat.description %}
+        <h3 style="color: #333; margin-bottom: 0.8rem;">Опис</h3>
+        <div class="description-box">{{ beat.description }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

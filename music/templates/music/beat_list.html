@@ -1,0 +1,291 @@
+<!-- templates/music/beat_list.html -->
+{% extends "music/base.html" %}
+{% block title %}Мої біти - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .beats-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+    }
+
+    .beats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+
+    .beat-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+
+    .beat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .beat-cover {
+        height: 200px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        position: relative;
+    }
+
+    .beat-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255,255,255,0.9);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge-exclusive {
+        color: #f5576c;
+    }
+
+    .badge-available {
+        color: #28a745;
+    }
+
+    .beat-info {
+        padding: 1.5rem;
+    }
+
+    .beat-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .beat-meta {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .meta-item {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .meta-label {
+        color: #999;
+        font-size: 0.8rem;
+    }
+
+    .beat-stats {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .stat-item {
+        flex: 1;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #f093fb;
+    }
+
+    .stat-label {
+        color: #999;
+        font-size: 0.75rem;
+    }
+
+    .beat-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 0.6rem 1rem;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn-view {
+        background: #f093fb;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #e07fea;
+    }
+
+    .btn-edit {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #5568d3;
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #c82333;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h2 {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #999;
+        margin-bottom: 2rem;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #f093fb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="beats-container">
+    <a href="{% url 'music:producer_dashboard' %}" class="back-link">← Назад до панелі</a>
+
+    <div class="page-header">
+        <h1>🎹 Мої біти</h1>
+        <a href="{% url 'music:beat_create' %}" class="btn-primary">➕ Створити біт</a>
+    </div>
+
+    {% if beats %}
+    <div class="beats-grid">
+        {% for beat in beats %}
+        <div class="beat-card">
+            <div class="beat-cover" style="background: linear-gradient(135deg, 
+                {% cycle '#f093fb 0%, #f5576c 100%' '#667eea 0%, #764ba2 100%' '#43e97b 0%, #38f9d7 100%' '#fa709a 0%, #fee140 100%' '#ff9a9e 0%, #fecfef 100%' '#a8edea 0%, #fed6e3 100%' %});">
+                🎹
+                {% if beat.is_exclusive %}
+                <div class="beat-badge badge-exclusive">⭐ Ексклюзив</div>
+                {% elif beat.is_available %}
+                <div class="beat-badge badge-available">✓ Доступний</div>
+                {% endif %}
+            </div>
+            <div class="beat-info">
+                <div class="beat-title">{{ beat.title }}</div>
+                <div class="beat-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Жанр</div>
+                        {{ beat.get_genre_display }}
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">BPM</div>
+                        {{ beat.bpm }}
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Ціна</div>
+                        {% if beat.price %}${{ beat.price }}{% else %}Не вказано{% endif %}
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Створено</div>
+                        {{ beat.created_at|date:"d.m.Y" }}
+                    </div>
+                </div>
+                <div class="beat-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ beat.plays_count }}</div>
+                        <div class="stat-label">Прослуховувань</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ beat.downloads_count }}</div>
+                        <div class="stat-label">Завантажень</div>
+                    </div>
+                </div>
+                <div class="beat-actions">
+                    <a href="{% url 'music:beat_detail' beat.pk %}" class="btn btn-view">Переглянути</a>
+                    <a href="{% url 'music:beat_update' beat.pk %}" class="btn btn-edit">Редагувати</a>
+                    <a href="{% url 'music:beat_delete' beat.pk %}" class="btn btn-delete">Видалити</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🎹</div>
+        <h2>У вас поки немає бітів</h2>
+        <p>Створіть свій перший біт та почніть співпрацювати з артистами!</p>
+        <a href="{% url 'music:beat_create' %}" class="btn-primary">Створити перший біт</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

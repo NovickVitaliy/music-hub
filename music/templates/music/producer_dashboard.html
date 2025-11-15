@@ -91,7 +91,6 @@
         box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         text-align: center;
         transition: all 0.3s ease;
-        cursor: pointer;
         border: 2px solid transparent;
     }
 
@@ -142,6 +141,28 @@
         margin-bottom: 2rem;
     }
 
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+    }
+
     .project-item {
         padding: 1.5rem;
         border: 2px solid #f0f0f0;
@@ -185,6 +206,16 @@
         color: #856404;
     }
 
+    .status-recording {
+        background: #cce5ff;
+        color: #004085;
+    }
+
+    .status-mixing {
+        background: #e2d9f3;
+        color: #5a2d82;
+    }
+
     .project-details {
         color: #666;
         font-size: 0.95rem;
@@ -215,6 +246,8 @@
         overflow: hidden;
         transition: all 0.3s ease;
         cursor: pointer;
+        text-decoration: none;
+        display: block;
     }
 
     .beat-card:hover {
@@ -246,6 +279,17 @@
         font-size: 0.85rem;
     }
 
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #999;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
     @media (max-width: 768px) {
         .dashboard-container {
             padding: 1rem;
@@ -268,7 +312,7 @@
 <div class="dashboard-container">
     <!-- Welcome Section -->
     <div class="welcome-section">
-        <h1>🎚️ Вітаємо, {{ user.username }}!</h1>
+        <h1>🎚️ Вітаємо, {{ user.stage_name|default:user.username }}!</h1>
         <p>Керуйте своїми бітами та співпрацями</p>
     </div>
 
@@ -277,22 +321,22 @@
         <div class="stat-card">
             <div class="stat-icon">🎹</div>
             <div class="stat-label">Бітів створено</div>
-            <div class="stat-value">48</div>
+            <div class="stat-value">{{ total_beats }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">🤝</div>
             <div class="stat-label">Активних проєктів</div>
-            <div class="stat-value">7</div>
+            <div class="stat-value">{{ total_collabs }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">▶️</div>
+            <div class="stat-label">Прослуховувань</div>
+            <div class="stat-value">{{ total_plays }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">👥</div>
-            <div class="stat-label">Співпраць з артистами</div>
-            <div class="stat-value">15</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">💰</div>
-            <div class="stat-label">Дохід (цього місяця)</div>
-            <div class="stat-value">$850</div>
+            <div class="stat-label">Співпраць</div>
+            <div class="stat-value">{{ total_collabs }}</div>
         </div>
     </div>
 
@@ -302,136 +346,108 @@
         <div class="actions-grid">
             <div class="action-card">
                 <div class="action-icon">🎹</div>
-                <h3>Завантажити біт</h3>
+                <h3>Створити біт</h3>
                 <p>Додайте новий біт до портфоліо</p>
-                <a href="#" class="action-btn">Завантажити</a>
+                <a href="{% url 'music:beat_create' %}" class="action-btn">Створити</a>
             </div>
             <div class="action-card">
-                <div class="action-icon">🔍</div>
-                <h3>Знайти артистів</h3>
-                <p>Шукайте талановитих виконавців</p>
-                <a href="#" class="action-btn">Пошук</a>
+                <div class="action-icon">📀</div>
+                <h3>Мої біти</h3>
+                <p>Керуйте своїми бітами</p>
+                <a href="{% url 'music:beat_list' %}" class="action-btn">Переглянути</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">🤝</div>
+                <h3>Нова співпраця</h3>
+                <p>Розпочніть проєкт з артистом</p>
+                <a href="{% url 'music:collaboration_create' %}" class="action-btn">Створити</a>
             </div>
             <div class="action-card">
                 <div class="action-icon">📁</div>
                 <h3>Мої проєкти</h3>
                 <p>Керуйте активними співпрацями</p>
-                <a href="#" class="action-btn">Переглянути</a>
+                <a href="{% url 'music:collaboration_list' %}" class="action-btn">Переглянути</a>
             </div>
             <div class="action-card">
-                <div class="action-icon">📊</div>
-                <h3>Аналітика</h3>
-                <p>Статистика завантажень та продажів</p>
-                <a href="#" class="action-btn">Відкрити</a>
+                <div class="action-icon">🔍</div>
+                <h3>Знайти артистів</h3>
+                <p>Шукайте талановитих виконавців</p>
+                <a href="{% url 'music:artist_search' %}" class="action-btn">Пошук</a>
             </div>
             <div class="action-card">
-                <div class="action-icon">💼</div>
-                <h3>Портфоліо</h3>
+                <div class="action-icon">👤</div>
+                <h3>Профіль</h3>
                 <p>Редагуйте своє портфоліо</p>
-                <a href="#" class="action-btn">Редагувати</a>
-            </div>
-            <div class="action-card">
-                <div class="action-icon">💸</div>
-                <h3>Продажі</h3>
-                <p>Керуйте продажами бітів</p>
-                <a href="#" class="action-btn">Переглянути</a>
+                <a href="{% url 'music:profile' %}" class="action-btn">Редагувати</a>
             </div>
         </div>
     </div>
 
     <!-- Active Projects -->
     <div class="projects-section">
-        <h2 class="section-title">Активні проєкти</h2>
+        <div class="section-header">
+            <h2 class="section-title">Активні проєкти</h2>
+            <a href="{% url 'music:collaboration_list' %}" class="btn-primary">Переглянути всі</a>
+        </div>
         
-        <div class="project-item">
-            <div class="project-header">
-                <div class="project-title">🎵 Trap Beat Collab</div>
-                <span class="project-status status-active">Активний</span>
+        {% if active_projects %}
+            {% for collab in active_projects %}
+            <div class="project-item">
+                <div class="project-header">
+                    <div class="project-title">🎵 {{ collab.project_name }}</div>
+                    <span class="project-status status-{{ collab.status }}">
+                        {{ collab.get_status_display }}
+                    </span>
+                </div>
+                <div class="project-details">
+                    <p><strong>Артист:</strong> {{ collab.artist.stage_name|default:collab.artist.username }}</p>
+                    {% if collab.beat %}
+                    <p><strong>Біт:</strong> {{ collab.beat.title }}</p>
+                    {% endif %}
+                    {% if collab.deadline %}
+                    <p><strong>Дедлайн:</strong> {{ collab.deadline|date:"d.m.Y" }}</p>
+                    {% endif %}
+                </div>
             </div>
-            <div class="project-details">
-                <p><strong>Артист:</strong> MC Flow</p>
-                <p><strong>Статус:</strong> Очікується запис вокалу</p>
-                <p><strong>Дедлайн:</strong> 15 листопада 2025</p>
-            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📁</div>
+            <p>У вас немає активних проєктів</p>
+            <a href="{% url 'music:collaboration_create' %}" class="btn-primary">Створити проєкт</a>
         </div>
-
-        <div class="project-item">
-            <div class="project-header">
-                <div class="project-title">🎹 Lo-Fi Album Production</div>
-                <span class="project-status status-active">Активний</span>
-            </div>
-            <div class="project-details">
-                <p><strong>Артист:</strong> ChillBeats UA</p>
-                <p><strong>Статус:</strong> Міксування 5-го треку</p>
-                <p><strong>Дедлайн:</strong> 30 листопада 2025</p>
-            </div>
-        </div>
-
-        <div class="project-item">
-            <div class="project-header">
-                <div class="project-title">🎸 Rock Single</div>
-                <span class="project-status status-pending">Очікує</span>
-            </div>
-            <div class="project-details">
-                <p><strong>Артист:</strong> Rebel Sound</p>
-                <p><strong>Статус:</strong> Очікується підтвердження контракту</p>
-                <p><strong>Запропоновано:</strong> 3 дні тому</p>
-            </div>
-        </div>
+        {% endif %}
     </div>
 
     <!-- My Beats -->
     <div class="beats-section">
-        <h2 class="section-title">Мої біти</h2>
-        <div class="beats-grid">
-            <div class="beat-card">
-                <div class="beat-cover">🎹</div>
-                <div class="beat-info">
-                    <div class="beat-name">Dark Trap Beat</div>
-                    <div class="beat-stats">120 BPM • 340 прослуховувань</div>
-                </div>
-            </div>
-
-            <div class="beat-card">
-                <div class="beat-cover" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">🎵</div>
-                <div class="beat-info">
-                    <div class="beat-name">Chill Lo-Fi</div>
-                    <div class="beat-stats">85 BPM • 520 прослуховувань</div>
-                </div>
-            </div>
-
-            <div class="beat-card">
-                <div class="beat-cover" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">🎸</div>
-                <div class="beat-info">
-                    <div class="beat-name">Rock Energy</div>
-                    <div class="beat-stats">140 BPM • 280 прослуховувань</div>
-                </div>
-            </div>
-
-            <div class="beat-card">
-                <div class="beat-cover" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🎺</div>
-                <div class="beat-info">
-                    <div class="beat-name">Jazz Vibes</div>
-                    <div class="beat-stats">95 BPM • 450 прослуховувань</div>
-                </div>
-            </div>
-
-            <div class="beat-card">
-                <div class="beat-cover" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">🎼</div>
-                <div class="beat-info">
-                    <div class="beat-name">Electronic Wave</div>
-                    <div class="beat-stats">128 BPM • 610 прослуховувань</div>
-                </div>
-            </div>
-
-            <div class="beat-card">
-                <div class="beat-cover" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">🥁</div>
-                <div class="beat-info">
-                    <div class="beat-name">Hip-Hop Classic</div>
-                    <div class="beat-stats">90 BPM • 720 прослуховувань</div>
-                </div>
-            </div>
+        <div class="section-header">
+            <h2 class="section-title">Мої біти</h2>
+            <a href="{% url 'music:beat_list' %}" class="btn-primary">Переглянути всі</a>
         </div>
+        
+        {% if recent_beats %}
+        <div class="beats-grid">
+            {% for beat in recent_beats %}
+            <a href="{% url 'music:beat_detail' beat.pk %}" class="beat-card">
+                <div class="beat-cover" style="background: linear-gradient(135deg, 
+                    {% cycle '#f093fb 0%, #f5576c 100%' '#667eea 0%, #764ba2 100%' '#43e97b 0%, #38f9d7 100%' '#fa709a 0%, #fee140 100%' '#ff9a9e 0%, #fecfef 100%' '#a8edea 0%, #fed6e3 100%' %});">
+                    🎹
+                </div>
+                <div class="beat-info">
+                    <div class="beat-name">{{ beat.title }}</div>
+                    <div class="beat-stats">{{ beat.bpm }} BPM • {{ beat.plays_count }} прослуховувань</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🎹</div>
+            <p>У вас ще немає бітів</p>
+            <a href="{% url 'music:beat_create' %}" class="btn-primary">Створити перший біт</a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
