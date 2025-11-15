@@ -22,7 +22,6 @@
     .welcome-section h1 {
         font-size: 2.5rem;
         margin-bottom: 0.5rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
 
     .welcome-section p {
@@ -68,16 +67,6 @@
         color: #333;
     }
 
-    .stat-trend {
-        font-size: 0.85rem;
-        color: #28a745;
-        margin-top: 0.5rem;
-    }
-
-    .stat-trend.down {
-        color: #dc3545;
-    }
-
     .actions-section {
         margin-bottom: 2rem;
     }
@@ -102,7 +91,6 @@
         box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         text-align: center;
         transition: all 0.3s ease;
-        cursor: pointer;
         border: 2px solid transparent;
     }
 
@@ -153,47 +141,42 @@
         margin-bottom: 2rem;
     }
 
-    .artist-table {
-        width: 100%;
-        border-collapse: collapse;
+    .artist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
     }
 
-    .artist-table thead {
+    .artist-card {
         background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
     }
 
-    .artist-table th {
-        padding: 1rem;
-        text-align: left;
-        font-weight: 600;
-        color: #333;
-        border-bottom: 2px solid #e0e0e0;
-    }
-
-    .artist-table td {
-        padding: 1rem;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .artist-table tr:hover {
-        background: #f8f9fa;
+    .artist-card:hover {
+        border-color: #fa709a;
+        transform: translateY(-3px);
     }
 
     .artist-info {
         display: flex;
         align-items: center;
         gap: 1rem;
+        margin-bottom: 1rem;
     }
 
     .artist-avatar {
-        width: 50px;
-        height: 50px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: 1.8rem;
     }
 
     .artist-details h4 {
@@ -204,47 +187,13 @@
 
     .artist-details p {
         color: #999;
-        font-size: 0.9rem;
-    }
-
-    .contract-status {
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
         font-size: 0.85rem;
-        font-weight: 600;
     }
 
-    .status-active {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .status-expiring {
-        background: #fff3cd;
-        color: #856404;
-    }
-
-    .status-pending {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-    .btn-manage {
-        padding: 0.5rem 1.5rem;
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 20px;
+    .artist-stats {
+        color: #666;
         font-size: 0.9rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-    }
-
-    .btn-manage:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 3px 10px rgba(250, 112, 154, 0.3);
+        margin-bottom: 0.5rem;
     }
 
     .contracts-section {
@@ -252,6 +201,28 @@
         padding: 2rem;
         border-radius: 15px;
         box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(250, 112, 154, 0.4);
     }
 
     .contract-item {
@@ -280,14 +251,80 @@
         font-weight: 600;
     }
 
+    .contract-status {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-expiring {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-pending {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
     .contract-details {
         color: #666;
         font-size: 0.95rem;
-        line-height: 1.6;
+        line-height: 1.8;
     }
 
     .contract-details strong {
         color: #333;
+    }
+
+    .contract-actions {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-small {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-view {
+        background: #fa709a;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #e85d86;
+    }
+
+    .btn-edit {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #5568d3;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #999;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
     }
 
     @media (max-width: 768px) {
@@ -297,15 +334,6 @@
 
         .welcome-section h1 {
             font-size: 2rem;
-        }
-
-        .artist-table {
-            font-size: 0.9rem;
-        }
-
-        .artist-table th,
-        .artist-table td {
-            padding: 0.8rem 0.5rem;
         }
     }
 </style>
@@ -324,26 +352,22 @@
         <div class="stat-card">
             <div class="stat-icon">👥</div>
             <div class="stat-label">Артистів під контрактом</div>
-            <div class="stat-value">12</div>
-            <div class="stat-trend">↑ +2 цього місяця</div>
+            <div class="stat-value">{{ total_artists }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">💿</div>
             <div class="stat-label">Активних релізів</div>
-            <div class="stat-value">28</div>
-            <div class="stat-trend">↑ +5 цього тижня</div>
+            <div class="stat-value">{{ total_releases }}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">💰</div>
-            <div class="stat-label">Дохід (цього місяця)</div>
-            <div class="stat-value">$15.2K</div>
-            <div class="stat-trend">↑ +18% від минулого</div>
+            <div class="stat-icon">📄</div>
+            <div class="stat-label">Активних контрактів</div>
+            <div class="stat-value">{{ active_contracts_count }}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">📊</div>
-            <div class="stat-label">Загальні прослуховування</div>
-            <div class="stat-value">2.4M</div>
-            <div class="stat-trend">↑ +12% цього місяця</div>
+            <div class="stat-icon">🎵</div>
+            <div class="stat-label">Загальна кількість треків</div>
+            <div class="stat-value">{{ total_tracks }}</div>
         </div>
     </div>
 
@@ -355,161 +379,96 @@
                 <div class="action-icon">✍️</div>
                 <h3>Новий контракт</h3>
                 <p>Укласти контракт з артистом</p>
-                <a href="#" class="action-btn">Створити</a>
+                <a href="{% url 'music:contract_create' %}" class="action-btn">Створити</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">📋</div>
+                <h3>Мої контракти</h3>
+                <p>Переглянути всі контракти</p>
+                <a href="{% url 'music:contract_list' %}" class="action-btn">Переглянути</a>
             </div>
             <div class="action-card">
                 <div class="action-icon">🔍</div>
                 <h3>Пошук талантів</h3>
                 <p>Знайдіть нових перспективних артистів</p>
-                <a href="#" class="action-btn">Шукати</a>
-            </div>
-            <div class="action-card">
-                <div class="action-icon">📈</div>
-                <h3>Аналітика</h3>
-                <p>Детальна статистика лейблу</p>
-                <a href="#" class="action-btn">Переглянути</a>
-            </div>
-            <div class="action-card">
-                <div class="action-icon">🎵</div>
-                <h3>Реліз треку</h3>
-                <p>Опублікувати новий реліз</p>
-                <a href="#" class="action-btn">Опублікувати</a>
+                <a href="{% url 'music:music_search' %}" class="action-btn">Шукати</a>
             </div>
             <div class="action-card">
                 <div class="action-icon">💼</div>
                 <h3>Портфоліо лейблу</h3>
                 <p>Редагуйте інформацію про лейбл</p>
-                <a href="#" class="action-btn">Редагувати</a>
-            </div>
-            <div class="action-card">
-                <div class="action-icon">💸</div>
-                <h3>Фінанси</h3>
-                <p>Керування платежами та роялті</p>
-                <a href="#" class="action-btn">Відкрити</a>
+                <a href="{% url 'music:profile' %}" class="action-btn">Редагувати</a>
             </div>
         </div>
     </div>
 
     <!-- Artists Under Contract -->
+    {% if managed_artists %}
     <div class="artists-section">
         <h2 class="section-title">Артисти лейблу</h2>
-        <table class="artist-table">
-            <thead>
-                <tr>
-                    <th>Артист</th>
-                    <th>Жанр</th>
-                    <th>Контракт</th>
-                    <th>Треків</th>
-                    <th>Дії</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <div class="artist-info">
-                            <div class="artist-avatar">🎤</div>
-                            <div class="artist-details">
-                                <h4>MC Flow</h4>
-                                <p>Ukrainian Hip-Hop</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td>Hip-Hop</td>
-                    <td><span class="contract-status status-active">Активний</span></td>
-                    <td>15</td>
-                    <td><button class="btn-manage">Керувати</button></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="artist-info">
-                            <div class="artist-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🎸</div>
-                            <div class="artist-details">
-                                <h4>Rock Rebels</h4>
-                                <p>Alternative Rock</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td>Rock</td>
-                    <td><span class="contract-status status-active">Активний</span></td>
-                    <td>22</td>
-                    <td><button class="btn-manage">Керувати</button></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="artist-info">
-                            <div class="artist-avatar" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">🎹</div>
-                            <div class="artist-details">
-                                <h4>ChillBeats UA</h4>
-                                <p>Lo-Fi / Electronic</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td>Electronic</td>
-                    <td><span class="contract-status status-expiring">Закінчується</span></td>
-                    <td>18</td>
-                    <td><button class="btn-manage">Керувати</button></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="artist-info">
-                            <div class="artist-avatar" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🎺</div>
-                            <div class="artist-details">
-                                <h4>Jazz Collective</h4>
-                                <p>Contemporary Jazz</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td>Jazz</td>
-                    <td><span class="contract-status status-pending">На розгляді</span></td>
-                    <td>8</td>
-                    <td><button class="btn-manage">Керувати</button></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="artist-grid">
+            {% for artist in managed_artists %}
+            <div class="artist-card">
+                <div class="artist-info">
+                    <div class="artist-avatar" style="background: linear-gradient(135deg, 
+                        {% cycle '#667eea 0%, #764ba2 100%' '#f093fb 0%, #f5576c 100%' '#43e97b 0%, #38f9d7 100%' '#fa709a 0%, #fee140 100%' %});">
+                        🎤
+                    </div>
+                    <div class="artist-details">
+                        <h4>{{ artist.stage_name|default:artist.username }}</h4>
+                        <p>{{ artist.bio|truncatewords:5|default:"Артист" }}</p>
+                    </div>
+                </div>
+                <div class="artist-stats">
+                    💿 Альбомів: {{ artist.albums_count }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+    {% endif %}
 
     <!-- Recent Contracts -->
     <div class="contracts-section">
-        <h2 class="section-title">Останні контракти</h2>
+        <div class="section-header">
+            <h2 class="section-title">Останні контракти</h2>
+            <a href="{% url 'music:contract_list' %}" class="btn-primary">Переглянути всі</a>
+        </div>
         
-        <div class="contract-item">
-            <div class="contract-header">
-                <div class="contract-title">📄 Контракт з MC Flow</div>
-                <span class="contract-status status-active">Активний</span>
+        {% if recent_contracts %}
+            {% for contract in recent_contracts %}
+            <div class="contract-item">
+                <div class="contract-header">
+                    <div class="contract-title">
+                        📄 {{ contract.artist.stage_name|default:contract.artist.username }}
+                    </div>
+                    <span class="contract-status status-{{ contract.status }}">
+                        {{ contract.get_status_display }}
+                    </span>
+                </div>
+                <div class="contract-details">
+                    <p><strong>Тип:</strong> {{ contract.get_contract_type_display }}</p>
+                    <p><strong>Термін:</strong> {{ contract.duration_months }} місяців 
+                        {% if contract.status != 'pending' %}
+                            (залишилось {{ contract.months_remaining }} міс.)
+                        {% endif %}
+                    </p>
+                    <p><strong>Роялті:</strong> {{ contract.artist_royalty_percent }}% артисту / {{ contract.label_royalty_percent }}% лейблу</p>
+                    <p><strong>Дата підписання:</strong> {{ contract.start_date|date:"d.m.Y" }}</p>
+                </div>
+                <div class="contract-actions">
+                    <a href="{% url 'music:contract_detail' contract.pk %}" class="btn-small btn-view">Переглянути</a>
+                    <a href="{% url 'music:contract_update' contract.pk %}" class="btn-small btn-edit">Редагувати</a>
+                </div>
             </div>
-            <div class="contract-details">
-                <p><strong>Тип:</strong> Ексклюзивний реліз</p>
-                <p><strong>Термін:</strong> 24 місяці (залишилось 18 міс.)</p>
-                <p><strong>Роялті:</strong> 70% артисту / 30% лейблу</p>
-                <p><strong>Дата підписання:</strong> 15 січня 2024</p>
-            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📄</div>
+            <p>У вас ще немає контрактів</p>
+            <a href="{% url 'music:contract_create' %}" class="btn-primary">Створити перший контракт</a>
         </div>
-
-        <div class="contract-item">
-            <div class="contract-header">
-                <div class="contract-title">📄 Контракт з ChillBeats UA</div>
-                <span class="contract-status status-expiring">Закінчується</span>
-            </div>
-            <div class="contract-details">
-                <p><strong>Тип:</strong> Дистрибуція альбому</p>
-                <p><strong>Термін:</strong> 12 місяців (залишилось 2 міс.)</p>
-                <p><strong>Роялті:</strong> 60% артисту / 40% лейблу</p>
-                <p><strong>Дата підписання:</strong> 10 жовтня 2024</p>
-            </div>
-        </div>
-
-        <div class="contract-item">
-            <div class="contract-header">
-                <div class="contract-title">📄 Пропозиція для Jazz Collective</div>
-                <span class="contract-status status-pending">На розгляді</span>
-            </div>
-            <div class="contract-details">
-                <p><strong>Тип:</strong> Довгострокова співпраця</p>
-                <p><strong>Запропонований термін:</strong> 36 місяців</p>
-                <p><strong>Роялті:</strong> 65% артисту / 35% лейблу</p>
-                <p><strong>Статус:</strong> Очікується відповідь артиста</p>
-            </div>
-        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

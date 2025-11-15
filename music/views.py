@@ -6,8 +6,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count, Sum
-from .forms import CustomUserCreationForm, AlbumForm, TrackForm
-from .models import User, Album, Genre, Track
+from .forms import ContractForm, CustomUserCreationForm, AlbumForm, TrackForm
+from .models import Contract, User, Album, Genre, Track
 from .models import User, Album, Genre, Track, Playlist, Favorite
 from .forms import CustomUserCreationForm, AlbumForm, TrackForm, PlaylistForm
 from django.db import models
@@ -56,7 +56,7 @@ def login_view(request):
                 return redirect('music:producer_dashboard')
             elif user.role == 'listener':
                 return redirect('music:listener_home')
-            elif user.role == 'manager':
+            elif user.role == 'label_manager':
                 return redirect('music:manager_dashboard')
             
             return redirect('music:dashboard')
@@ -521,3 +521,121 @@ def quick_add_to_playlist(request, track_pk):
 def logout_view(request):
     logout(request)
     return redirect('music:landing')
+
+# ==================== MANAGER DASHBOARD ====================
+@login_required
+def manager_dashboard(request):
+    """Панель менеджера лейблу"""
+    if request.user.role != 'label_manager':
+        messages.error(request, 'У вас немає доступу до цієї сторінки')
+        return redirect('music:dashboard')
+    
+    total_artists = Contract.objects.filter(manager=request.user, status='active').count()
+    total_releases = Album.objects.filter(
+        artist__contracts__manager=request.user,
+        artist__contracts__status='active'
+    ).distinct().count()
+    
+    managed_artists = User.objects.filter(
+        role='artist',
+        contracts__manager=request.user,
+        contracts__status__in=['active', 'expiring']
+    ).distinct().annotate(
+        albums_count=Count('album')
+    )[:4]
+    
+    recent_contracts = Contract.objects.filter(manager=request.user).select_related('artist').order_by('-created_at')[:3]
+    
+    context = {
+        'total_artists': total_artists,
+        'total_releases': total_releases,
+        'managed_artists': managed_artists,
+        'recent_contracts': recent_contracts,
+    }
+    return render(request, 'music/manager_dashboard.html', context)
+
+
+# ==================== CONTRACT CRUD ====================
+@login_required
+def contract_list(request):
+    """Список контрактів"""
+    if request.user.role != 'label_manager':
+        messages.error(request, 'У вас немає доступу до цієї сторінки')
+        return redirect('music:dashboard')
+    
+    contracts = Contract.objects.filter(manager=request.user).select_related('artist').order_by('-created_at')
+    
+    context = {'contracts': contracts}
+    return render(request, 'music/contract_list.html', context)
+
+
+@login_required
+def contract_create(request):
+    """Створення контракту"""
+    if request.user.role != 'label_manager':
+        messages.error(request, 'У вас немає доступу до цієї сторінки')
+        return redirect('music:dashboard')
+    
+    if request.method == 'POST':
+        form = ContractForm(request.POST)
+        if form.is_valid():
+            contract = form.save(commit=False)
+            contract.manager = request.user
+            contract.save()
+            messages.success(request, f'Контракт з {contract.artist.stage_name or contract.artist.username} створено!')
+            return redirect('music:contract_detail', pk=contract.pk)
+    else:
+        form = ContractForm()
+    
+    context = {'form': form, 'action': 'Створити'}
+    return render(request, 'music/contract_form.html', context)
+
+
+@login_required
+def contract_detail(request, pk):
+    """Детальна інформація про контракт"""
+    contract = get_object_or_404(Contract, pk=pk, manager=request.user)
+    artist_albums = Album.objects.filter(artist=contract.artist)
+    
+    context = {
+        'contract': contract,
+        'artist_albums': artist_albums,
+    }
+    return render(request, 'music/contract_detail.html', context)
+
+
+@login_required
+def contract_update(request, pk):
+    """Редагування контракту"""
+    contract = get_object_or_404(Contract, pk=pk, manager=request.user)
+    
+    if request.method == 'POST':
+        form = ContractForm(request.POST, instance=contract)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Контракт оновлено!')
+            return redirect('music:contract_detail', pk=contract.pk)
+    else:
+        form = ContractForm(instance=contract)
+    
+    context = {
+        'form': form,
+        'contract': contract,
+        'action': 'Оновити'
+    }
+    return render(request, 'music/contract_form.html', context)
+
+
+@login_required
+def contract_delete(request, pk):
+    """Видалення контракту"""
+    contract = get_object_or_404(Contract, pk=pk, manager=request.user)
+    
+    if request.method == 'POST':
+        artist_name = contract.artist.stage_name or contract.artist.username
+        contract.delete()
+        messages.success(request, f'Контракт з {artist_name} видалено!')
+        return redirect('music:contract_list')
+    
+    context = {'contract': contract}
+    return render(request, 'music/contract_confirm_delete.html', context)

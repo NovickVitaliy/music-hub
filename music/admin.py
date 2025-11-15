@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User, Genre, Album, Track
-from .models import User, Genre, Album, Track, Playlist, Favorite
+from .models import User, Genre, Album, Track, Playlist, Favorite, Contract
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
@@ -65,6 +65,17 @@ class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('user', 'track', 'created_at')
     list_filter = ('created_at',)
     search_fields = ('user__username', 'track__title')
+
+@admin.register(Contract)
+class ContractAdmin(admin.ModelAdmin):
+    list_display = ('artist', 'manager', 'contract_type', 'status', 'start_date', 'end_date', 'months_remaining')
+    list_filter = ('status', 'contract_type', 'start_date')
+    search_fields = ('artist__username', 'artist__stage_name', 'manager__username')
+    date_hierarchy = 'start_date'
+    
+    def months_remaining(self, obj):
+        return obj.months_remaining()
+    months_remaining.short_description = 'Місяців залишилось'
 
 # Налаштування заголовків адмін панелі
 admin.site.site_header = 'MusicHub Ukraine - Адміністрування'

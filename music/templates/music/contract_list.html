@@ -1,0 +1,330 @@
+<!-- templates/music/contract_list.html -->
+{% extends "music/base.html" %}
+{% block title %}Контракти - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contracts-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(250, 112, 154, 0.4);
+    }
+
+    .contracts-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .contract-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid #fa709a;
+    }
+
+    .contract-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .contract-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .artist-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .artist-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+    }
+
+    .artist-details h3 {
+        color: #333;
+        margin-bottom: 0.3rem;
+        font-size: 1.3rem;
+    }
+
+    .artist-details p {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .contract-status {
+        padding: 0.5rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-expiring {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-pending {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-expired {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .contract-body {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .contract-field {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 10px;
+    }
+
+    .field-label {
+        color: #999;
+        font-size: 0.85rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .field-value {
+        color: #333;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .contract-actions {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.6rem 1.5rem;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-view {
+        background: #fa709a;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #e85d86;
+    }
+
+    .btn-edit {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #5568d3;
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #c82333;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-tab {
+        padding: 0.7rem 1.5rem;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        color: #666;
+    }
+
+    .filter-tab:hover {
+        border-color: #fa709a;
+        color: #fa709a;
+    }
+
+    .filter-tab.active {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        border-color: transparent;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h2 {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #999;
+        margin-bottom: 2rem;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #fa709a;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contracts-container">
+    <a href="{% url 'music:manager_dashboard' %}" class="back-link">← Назад до панелі</a>
+
+    <div class="page-header">
+        <h1>📄 Контракти</h1>
+        <a href="{% url 'music:contract_create' %}" class="btn-primary">➕ Новий контракт</a>
+    </div>
+
+    {% if contracts %}
+    <div class="contracts-grid">
+        {% for contract in contracts %}
+        <div class="contract-card">
+            <div class="contract-header">
+                <div class="artist-info">
+                    <div class="artist-avatar" style="background: linear-gradient(135deg, 
+                        {% cycle '#667eea 0%, #764ba2 100%' '#f093fb 0%, #f5576c 100%' '#43e97b 0%, #38f9d7 100%' '#fa709a 0%, #fee140 100%' %});">
+                        🎤
+                    </div>
+                    <div class="artist-details">
+                        <h3>{{ contract.artist.stage_name|default:contract.artist.username }}</h3>
+                        <p>{{ contract.get_contract_type_display }}</p>
+                    </div>
+                </div>
+                <span class="contract-status status-{{ contract.status }}">
+                    {{ contract.get_status_display }}
+                </span>
+            </div>
+
+            <div class="contract-body">
+                <div class="contract-field">
+                    <div class="field-label">Роялті артиста</div>
+                    <div class="field-value">{{ contract.artist_royalty_percent }}%</div>
+                </div>
+                <div class="contract-field">
+                    <div class="field-label">Роялті лейблу</div>
+                    <div class="field-value">{{ contract.label_royalty_percent }}%</div>
+                </div>
+                <div class="contract-field">
+                    <div class="field-label">Тривалість</div>
+                    <div class="field-value">{{ contract.duration_months }} міс.</div>
+                </div>
+                <div class="contract-field">
+                    <div class="field-label">Залишилось</div>
+                    <div class="field-value">{{ contract.months_remaining }} міс.</div>
+                </div>
+                <div class="contract-field">
+                    <div class="field-label">Дата початку</div>
+                    <div class="field-value">{{ contract.start_date|date:"d.m.Y" }}</div>
+                </div>
+                <div class="contract-field">
+                    <div class="field-label">Дата закінчення</div>
+                    <div class="field-value">{{ contract.end_date|date:"d.m.Y" }}</div>
+                </div>
+            </div>
+
+            <div class="contract-actions">
+                <a href="{% url 'music:contract_detail' contract.pk %}" class="btn btn-view">Переглянути</a>
+                <a href="{% url 'music:contract_update' contract.pk %}" class="btn btn-edit">Редагувати</a>
+                <a href="{% url 'music:contract_delete' contract.pk %}" class="btn btn-delete">Видалити</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📄</div>
+        <h2>У вас поки немає контрактів</h2>
+        <p>Створіть свій перший контракт з артистом!</p>
+        <a href="{% url 'music:contract_create' %}" class="btn-primary">Створити контракт</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

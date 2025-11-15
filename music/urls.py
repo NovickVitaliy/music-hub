@@ -54,4 +54,11 @@ urlpatterns = [
     # Music Search
     path('search/', views.music_search, name='music_search'),
     path('tracks/<int:track_pk>/quick-add/', views.quick_add_to_playlist, name='quick_add_to_playlist'),
+
+    # Contract CRUD
+    path('contracts/', views.contract_list, name='contract_list'),
+    path('contracts/create/', views.contract_create, name='contract_create'),
+    path('contracts/<int:pk>/', views.contract_detail, name='contract_detail'),
+    path('contracts/<int:pk>/edit/', views.contract_update, name='contract_update'),
+    path('contracts/<int:pk>/delete/', views.contract_delete, name='contract_delete'),
 ]

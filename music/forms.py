@@ -2,7 +2,7 @@
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Playlist, User, Album, Track, Genre
+from .models import Contract, Playlist, User, Album, Track, Genre
 
 class CustomUserCreationForm(UserCreationForm):
     """Форма реєстрації з додатковими полями"""
@@ -166,3 +166,83 @@ class PlaylistForm(forms.ModelForm):
                 'placeholder': 'Опис плейлиста (необов\'язково)'
             }),
         }
+
+class ContractForm(forms.ModelForm):
+    """Форма для створення/редагування контракту"""
+    
+    class Meta:
+        model = Contract
+        fields = ['artist', 'contract_type', 'status', 'artist_royalty_percent', 
+                  'label_royalty_percent', 'duration_months', 'start_date', 'description', 'notes']
+        labels = {
+            'artist': 'Артист',
+            'contract_type': 'Тип контракту',
+            'status': 'Статус',
+            'artist_royalty_percent': 'Роялті артиста (%)',
+            'label_royalty_percent': 'Роялті лейблу (%)',
+            'duration_months': 'Тривалість (місяців)',
+            'start_date': 'Дата початку',
+            'description': 'Опис',
+            'notes': 'Примітки',
+        }
+        widgets = {
+            'artist': forms.Select(attrs={'class': 'form-control'}),
+            'contract_type': forms.Select(attrs={'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+            'artist_royalty_percent': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+                'max': '100'
+            }),
+            'label_royalty_percent': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+                'max': '100'
+            }),
+            'duration_months': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '1'
+            }),
+            'start_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Показуємо тільки артистів
+        self.fields['artist'].queryset = User.objects.filter(role='artist')
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        artist_percent = cleaned_data.get('artist_royalty_percent', 0)
+        label_percent = cleaned_data.get('label_royalty_percent', 0)
+        
+        if artist_percent + label_percent != 100:
+            raise forms.ValidationError(
+                'Сума роялті артиста та лейблу повинна дорівнювати 100%'
+            )
+        
+        return cleaned_data
+    
+    def save(self, commit=True):
+        contract = super().save(commit=False)
+        
+        # Автоматично розраховуємо дату закінчення
+        from dateutil.relativedelta import relativedelta
+        contract.end_date = contract.start_date + relativedelta(months=contract.duration_months)
+        
+        if commit:
+            contract.save()
+        return contract

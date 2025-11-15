@@ -1,0 +1,197 @@
+<!-- templates/music/contract_confirm_delete.html -->
+{% extends "music/base.html" %}
+{% block title %}Видалити контракт - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        max-width: 600px;
+        margin: 3rem auto;
+        padding: 2rem;
+    }
+
+    .delete-card {
+        background: white;
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .warning-icon {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .delete-card h1 {
+        color: #dc3545;
+        margin-bottom: 1rem;
+        font-size: 2rem;
+    }
+
+    .contract-info {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin: 2rem 0;
+        text-align: left;
+    }
+
+    .contract-info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .contract-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .contract-info-label {
+        font-weight: 600;
+        color: #666;
+    }
+
+    .contract-info-value {
+        color: #333;
+    }
+
+    .warning-text {
+        color: #666;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .warning-text strong {
+        color: #dc3545;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 1rem;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+
+    .btn-cancel {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .btn-cancel:hover {
+        background: #e0e0e0;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #fa709a;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .contract-status {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-expiring {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-pending {
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <a href="{% url 'music:contract_detail' contract.pk %}" class="back-link">← Назад</a>
+
+    <div class="delete-card">
+        <div class="warning-icon">⚠️</div>
+        <h1>Видалити контракт?</h1>
+        
+        <span class="contract-status status-{{ contract.status }}">
+            {{ contract.get_status_display }}
+        </span>
+
+        <div class="contract-info">
+            <div class="contract-info-item">
+                <span class="contract-info-label">Артист:</span>
+                <span class="contract-info-value">{{ contract.artist.stage_name|default:contract.artist.username }}</span>
+            </div>
+            <div class="contract-info-item">
+                <span class="contract-info-label">Тип:</span>
+                <span class="contract-info-value">{{ contract.get_contract_type_display }}</span>
+            </div>
+            <div class="contract-info-item">
+                <span class="contract-info-label">Роялті (артист/лейбл):</span>
+                <span class="contract-info-value">{{ contract.artist_royalty_percent }}% / {{ contract.label_royalty_percent }}%</span>
+            </div>
+            <div class="contract-info-item">
+                <span class="contract-info-label">Період:</span>
+                <span class="contract-info-value">{{ contract.start_date|date:"d.m.Y" }} - {{ contract.end_date|date:"d.m.Y" }}</span>
+            </div>
+            <div class="contract-info-item">
+                <span class="contract-info-label">Залишилось:</span>
+                <span class="contract-info-value">{{ contract.months_remaining }} місяців</span>
+            </div>
+        </div>
+
+        <p class="warning-text">
+            Ви впевнені, що хочете видалити цей контракт? 
+            <strong>Ця дія незворотна.</strong>
+            Вся інформація про контракт буде видалена назавжди.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">🗑️ Так, видалити</button>
+                <a href="{% url 'music:contract_detail' contract.pk %}" class="btn btn-cancel">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

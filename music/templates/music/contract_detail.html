@@ -1,0 +1,381 @@
+<!-- templates/music/contract_detail.html -->
+{% extends "music/base.html" %}
+{% block title %}Контракт: {{ contract.artist.stage_name|default:contract.artist.username }} - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .contract-header {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(250, 112, 154, 0.3);
+    }
+
+    .artist-section {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .artist-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: white;
+        color: #fa709a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+    }
+
+    .artist-info h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .artist-info p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+
+    .contract-meta {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        opacity: 0.95;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn {
+        padding: 0.7rem 1.5rem;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .btn-white {
+        background: white;
+        color: #fa709a;
+    }
+
+    .btn-white:hover {
+        background: #f8f9fa;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+    }
+
+    .contract-status {
+        display: inline-block;
+        padding: 0.5rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-expiring {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-pending {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-expired {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .info-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        background: #f8f9fa;
+        padding: 1.2rem;
+        border-radius: 10px;
+    }
+
+    .info-label {
+        color: #999;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        color: #333;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .royalty-chart {
+        display: flex;
+        height: 40px;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+
+    .royalty-artist {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    .royalty-label {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    .description-box {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        line-height: 1.6;
+        color: #666;
+    }
+
+    .albums-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .albums-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .album-card {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .album-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .album-icon {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .album-title {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9rem;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #fa709a;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .detail-container {
+            padding: 1rem;
+        }
+
+        .artist-section {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .artist-info h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="{% url 'music:contract_list' %}" class="back-link">← Назад до списку</a>
+
+    <div class="contract-header">
+        <span class="contract-status status-{{ contract.status }}">
+            {{ contract.get_status_display }}
+        </span>
+        
+        <div class="artist-section">
+            <div class="artist-avatar">🎤</div>
+            <div class="artist-info">
+                <h1>{{ contract.artist.stage_name|default:contract.artist.username }}</h1>
+                <p>{{ contract.get_contract_type_display }}</p>
+            </div>
+        </div>
+
+        <div class="contract-meta">
+            <div class="meta-item">
+                <span>📅</span>
+                <span>{{ contract.start_date|date:"d.m.Y" }} - {{ contract.end_date|date:"d.m.Y" }}</span>
+            </div>
+            <div class="meta-item">
+                <span>⏱️</span>
+                <span>{{ contract.months_remaining }} місяців залишилось</span>
+            </div>
+            <div class="meta-item">
+                <span>📄</span>
+                <span>{{ contract.duration_months }} місяців загалом</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <a href="{% url 'music:contract_update' contract.pk %}" class="btn btn-white">✏️ Редагувати</a>
+            <a href="{% url 'music:contract_delete' contract.pk %}" class="btn btn-danger">🗑️ Видалити</a>
+        </div>
+    </div>
+
+    <!-- Financial Info -->
+    <div class="info-section">
+        <h2 class="section-title">💰 Фінансові умови</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Роялті артиста</div>
+                <div class="info-value">{{ contract.artist_royalty_percent }}%</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Роялті лейблу</div>
+                <div class="info-value">{{ contract.label_royalty_percent }}%</div>
+            </div>
+        </div>
+        <div class="royalty-chart">
+            <div class="royalty-artist" style="width: {{ contract.artist_royalty_percent }}%">
+                Артист {{ contract.artist_royalty_percent }}%
+            </div>
+            <div class="royalty-label" style="width: {{ contract.label_royalty_percent }}%">
+                Лейбл {{ contract.label_royalty_percent }}%
+            </div>
+        </div>
+    </div>
+
+    <!-- Contract Details -->
+    <div class="info-section">
+        <h2 class="section-title">📋 Деталі контракту</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Тип контракту</div>
+                <div class="info-value">{{ contract.get_contract_type_display }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Дата початку</div>
+                <div class="info-value">{{ contract.start_date|date:"d.m.Y" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Дата закінчення</div>
+                <div class="info-value">{{ contract.end_date|date:"d.m.Y" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Створено</div>
+                <div class="info-value">{{ contract.created_at|date:"d.m.Y" }}</div>
+            </div>
+        </div>
+
+        {% if contract.description %}
+        <div style="margin-top: 1.5rem;">
+            <h3 style="color: #333; margin-bottom: 0.8rem;">Опис</h3>
+            <div class="description-box">{{ contract.description }}</div>
+        </div>
+        {% endif %}
+
+        {% if contract.notes %}
+        <div style="margin-top: 1.5rem;">
+            <h3 style="color: #333; margin-bottom: 0.8rem;">Примітки</h3>
+            <div class="description-box">{{ contract.notes }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Artist Albums -->
+    {% if artist_albums %}
+    <div class="albums-section">
+        <h2 class="section-title">💿 Альбоми артиста</h2>
+        <div class="albums-grid">
+            {% for album in artist_albums %}
+            <div class="album-card">
+                <div class="album-icon">💿</div>
+                <div class="album-title">{{ album.title }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
