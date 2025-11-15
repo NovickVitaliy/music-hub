@@ -576,6 +576,14 @@ def contract_create(request):
         messages.error(request, 'У вас немає доступу до цієї сторінки')
         return redirect('music:dashboard')
     
+    # Отримуємо artist_id з GET параметра
+    artist_id = request.GET.get('artist')
+    initial_data = {}
+    
+    if artist_id:
+        artist = get_object_or_404(User, pk=artist_id, role='artist')
+        initial_data['artist'] = artist
+    
     if request.method == 'POST':
         form = ContractForm(request.POST)
         if form.is_valid():
@@ -585,9 +593,13 @@ def contract_create(request):
             messages.success(request, f'Контракт з {contract.artist.stage_name or contract.artist.username} створено!')
             return redirect('music:contract_detail', pk=contract.pk)
     else:
-        form = ContractForm()
+        form = ContractForm(initial=initial_data)
     
-    context = {'form': form, 'action': 'Створити'}
+    context = {
+        'form': form,
+        'action': 'Створити',
+        'preselected_artist': initial_data.get('artist')
+    }
     return render(request, 'music/contract_form.html', context)
 
 
@@ -639,3 +651,47 @@ def contract_delete(request, pk):
     
     context = {'contract': contract}
     return render(request, 'music/contract_confirm_delete.html', context)
+
+# ==================== ARTIST SEARCH FOR CONTRACTS ====================
+@login_required
+def artist_search(request):
+    """Пошук артистів для укладання контрактів"""
+    if request.user.role != 'label_manager':
+        messages.error(request, 'У вас немає доступу до цієї сторінки')
+        return redirect('music:dashboard')
+    
+    query = request.GET.get('q', '')
+    
+    # Отримуємо артистів, з якими вже є активні контракти
+    contracted_artist_ids = Contract.objects.filter(
+        manager=request.user,
+        status__in=['active', 'expiring']
+    ).values_list('artist_id', flat=True)
+    
+    artists = []
+    
+    if query:
+        # Пошук артистів
+        artists = User.objects.filter(
+            role='artist'
+        ).filter(
+            models.Q(username__icontains=query) |
+            models.Q(stage_name__icontains=query) |
+            models.Q(bio__icontains=query)
+        ).annotate(
+            albums_count=Count('album'),
+            tracks_count=Count('album__tracks')
+        ).distinct()[:20]
+    else:
+        # Показуємо всіх артистів, якщо немає пошукового запиту
+        artists = User.objects.filter(role='artist').annotate(
+            albums_count=Count('album'),
+            tracks_count=Count('album__tracks')
+        ).distinct()[:20]
+    
+    context = {
+        'query': query,
+        'artists': artists,
+        'contracted_artist_ids': list(contracted_artist_ids),
+    }
+    return render(request, 'music/artist_search.html', context)

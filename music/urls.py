@@ -61,4 +61,6 @@ urlpatterns = [
     path('contracts/<int:pk>/', views.contract_detail, name='contract_detail'),
     path('contracts/<int:pk>/edit/', views.contract_update, name='contract_update'),
     path('contracts/<int:pk>/delete/', views.contract_delete, name='contract_delete'),
+    # Artist Search for Contracts
+    path('artists/search/', views.artist_search, name='artist_search'),
 ]

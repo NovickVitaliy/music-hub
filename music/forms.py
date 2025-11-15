@@ -193,17 +193,20 @@ class ContractForm(forms.ModelForm):
                 'class': 'form-control',
                 'step': '0.01',
                 'min': '0',
-                'max': '100'
+                'max': '100',
+                'value': '70'  # Значення за замовчуванням
             }),
             'label_royalty_percent': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'step': '0.01',
                 'min': '0',
-                'max': '100'
+                'max': '100',
+                'value': '30'  # Значення за замовчуванням
             }),
             'duration_months': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'min': '1'
+                'min': '1',
+                'value': '12'  # Значення за замовчуванням
             }),
             'start_date': forms.DateInput(attrs={
                 'class': 'form-control',
@@ -223,6 +226,17 @@ class ContractForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Показуємо тільки артистів
         self.fields['artist'].queryset = User.objects.filter(role='artist')
+        
+        # Кастомне відображення
+        self.fields['artist'].label_from_instance = lambda obj: (
+            f"🎤 {obj.stage_name} (@{obj.username})" if obj.stage_name 
+            else f"🎤 {obj.username}"
+        )
+        
+        # Якщо артист вже обраний, робимо поле disabled для редагування
+        if self.instance and self.instance.pk:
+            self.fields['artist'].disabled = True
+            self.fields['artist'].help_text = "Артиста не можна змінити після створення контракту"
     
     def clean(self):
         cleaned_data = super().clean()

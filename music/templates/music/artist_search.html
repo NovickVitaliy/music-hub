@@ -1,0 +1,380 @@
+<!-- templates/music/artist_search.html -->
+{% extends "music/base.html" %}
+{% block title %}Пошук артистів - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .search-header {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(250, 112, 154, 0.3);
+    }
+
+    .search-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .search-form {
+        max-width: 600px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1.2rem 3.5rem 1.2rem 1.5rem;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+
+    .search-input:focus {
+        outline: none;
+        box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+    }
+
+    .search-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-50%) scale(1.05);
+    }
+
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .results-title {
+        font-size: 1.8rem;
+        color: #333;
+        font-weight: 700;
+    }
+
+    .results-count {
+        color: #999;
+        font-size: 1rem;
+    }
+
+    .artists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .artist-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .artist-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        border-color: #fa709a;
+    }
+
+    .artist-header {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .artist-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        flex-shrink: 0;
+    }
+
+    .artist-info h3 {
+        color: #333;
+        font-size: 1.4rem;
+        margin-bottom: 0.3rem;
+        font-weight: 700;
+    }
+
+    .artist-username {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .artist-bio {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        min-height: 3rem;
+    }
+
+    .artist-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-item {
+        background: #f8f9fa;
+        padding: 0.8rem;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #fa709a;
+    }
+
+    .stat-label {
+        color: #999;
+        font-size: 0.85rem;
+        margin-top: 0.3rem;
+    }
+
+    .artist-actions {
+        display: flex;
+        gap: 0.8rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 0.8rem 1.5rem;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-align: center;
+        font-size: 0.95rem;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(250, 112, 154, 0.4);
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    .contracted-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: #d4edda;
+        color: #155724;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h2 {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #999;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #fa709a;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .filter-info {
+        background: #e8f4f8;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #17a2b8;
+        color: #0c5460;
+    }
+
+    @media (max-width: 768px) {
+        .search-container {
+            padding: 1rem;
+        }
+
+        .search-header h1 {
+            font-size: 2rem;
+        }
+
+        .artists-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .artist-header {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <a href="{% url 'music:manager_dashboard' %}" class="back-link">← Назад до панелі</a>
+
+    <div class="search-header">
+        <h1>🔍 Пошук артистів</h1>
+        <form method="get" class="search-form">
+            <input 
+                type="text" 
+                name="q" 
+                class="search-input" 
+                placeholder="Шукайте артистів за ім'ям, псевдонімом або біографією..." 
+                value="{{ query }}"
+                autofocus
+            >
+            <button type="submit" class="search-btn">Знайти</button>
+        </form>
+    </div>
+
+    <div class="filter-info">
+        <strong>💡 Порада:</strong> Артисти з активними контрактами позначені зеленою міткою
+    </div>
+
+    {% if query %}
+    <div class="results-header">
+        <h2 class="results-title">
+            Результати пошуку
+        </h2>
+        <span class="results-count">Знайдено: {{ artists|length }}</span>
+    </div>
+    {% else %}
+    <div class="results-header">
+        <h2 class="results-title">
+            Всі артисти
+        </h2>
+        <span class="results-count">Всього: {{ artists|length }}</span>
+    </div>
+    {% endif %}
+
+    {% if artists %}
+    <div class="artists-grid">
+        {% for artist in artists %}
+        <div class="artist-card">
+            {% if artist.id in contracted_artist_ids %}
+            <div class="contracted-badge">✓ Під контрактом</div>
+            {% endif %}
+
+            <div class="artist-header">
+                <div class="artist-avatar" style="background: linear-gradient(135deg, 
+                    {% cycle '#667eea 0%, #764ba2 100%' '#f093fb 0%, #f5576c 100%' '#43e97b 0%, #38f9d7 100%' '#fa709a 0%, #fee140 100%' '#a8edea 0%, #fed6e3 100%' '#ff9a9e 0%, #fecfef 100%' %});">
+                    🎤
+                </div>
+                <div class="artist-info">
+                    <h3>{{ artist.stage_name|default:artist.username }}</h3>
+                    <div class="artist-username">@{{ artist.username }}</div>
+                </div>
+            </div>
+
+            <div class="artist-bio">
+                {{ artist.bio|truncatewords:20|default:"Артист без опису" }}
+            </div>
+
+            <div class="artist-stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{ artist.albums_count }}</div>
+                    <div class="stat-label">Альбомів</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ artist.tracks_count }}</div>
+                    <div class="stat-label">Треків</div>
+                </div>
+            </div>
+
+            <div class="artist-actions">
+                <a href="{% url 'music:contract_create' %}?artist={{ artist.id }}" class="btn btn-primary">
+                    ✍️ Створити контракт
+                </a>
+                {% if artist.albums_count > 0 %}
+                <a href="#" class="btn btn-secondary" title="Переглянути альбоми">
+                    💿
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h2>{% if query %}Нічого не знайдено{% else %}Немає артистів{% endif %}</h2>
+        <p>{% if query %}Спробуйте інший запит{% else %}В системі ще немає зареєстрованих артистів{% endif %}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

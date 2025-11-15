@@ -200,6 +200,12 @@
         </div>
         {% endif %}
 
+        {% if preselected_artist %}
+        <div class="royalty-info" style="background: #d4edda; border-color: #28a745;">
+            <p style="color: #155724;">✓ <strong>Обрано артиста:</strong> {{ preselected_artist.stage_name|default:preselected_artist.username }} (@{{ preselected_artist.username }})</p>
+        </div>
+        {% endif %}
+
         <div class="royalty-info">
             <p>💡 <strong>Важливо:</strong> Сума роялті артиста та лейблу повинна дорівнювати 100%</p>
         </div>
