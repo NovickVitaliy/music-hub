@@ -1,0 +1,171 @@
+<!-- templates/music/collaboration_confirm_delete.html -->
+{% extends "music/base.html" %}
+{% block title %}Видалити співпрацю - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        max-width: 600px;
+        margin: 3rem auto;
+        padding: 2rem;
+    }
+
+    .delete-card {
+        background: white;
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .warning-icon {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .delete-card h1 {
+        color: #dc3545;
+        margin-bottom: 1rem;
+        font-size: 2rem;
+    }
+
+    .collab-info {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin: 2rem 0;
+        text-align: left;
+    }
+
+    .collab-info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .collab-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .collab-info-label {
+        font-weight: 600;
+        color: #666;
+    }
+
+    .collab-info-value {
+        color: #333;
+    }
+
+    .warning-text {
+        color: #666;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .warning-text strong {
+        color: #dc3545;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 1rem;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+
+    .btn-cancel {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .btn-cancel:hover {
+        background: #e0e0e0;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #f093fb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <a href="{% url 'music:collaboration_detail' collab.pk %}" class="back-link">← Назад</a>
+
+    <div class="delete-card">
+        <div class="warning-icon">⚠️</div>
+        <h1>Видалити співпрацю?</h1>
+        
+        <div class="collab-info">
+            <div class="collab-info-item">
+                <span class="collab-info-label">Проєкт:</span>
+                <span class="collab-info-value">{{ collab.project_name }}</span>
+            </div>
+            <div class="collab-info-item">
+                <span class="collab-info-label">Артист:</span>
+                <span class="collab-info-value">{{ collab.artist.stage_name|default:collab.artist.username }}</span>
+            </div>
+            {% if collab.beat %}
+            <div class="collab-info-item">
+                <span class="collab-info-label">Біт:</span>
+                <span class="collab-info-value">{{ collab.beat.title }}</span>
+            </div>
+            {% endif %}
+            <div class="collab-info-item">
+                <span class="collab-info-label">Статус:</span>
+                <span class="collab-info-value">{{ collab.get_status_display }}</span>
+            </div>
+            <div class="collab-info-item">
+                <span class="collab-info-label">Частки:</span>
+                <span class="collab-info-value">{{ collab.producer_share }}% / {{ collab.artist_share }}%</span>
+            </div>
+        </div>
+
+        <p class="warning-text">
+            Ви впевнені, що хочете видалити цю співпрацю? 
+            <strong>Ця дія незворотна.</strong>
+            Вся інформація про проєкт буде втрачена.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">🗑️ Так, видалити</button>
+                <a href="{% url 'music:collaboration_detail' collab.pk %}" class="btn btn-cancel">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

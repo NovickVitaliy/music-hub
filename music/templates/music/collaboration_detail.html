@@ -1,0 +1,237 @@
+{% extends "music/base.html" %}
+{% block title %}{{ collab.project_name }} - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .collab-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(240, 147, 251, 0.3);
+    }
+
+    .collab-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .artist-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .artist-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: white;
+        color: #f093fb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+    }
+
+    .collab-meta {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        opacity: 0.95;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn {
+        padding: 0.7rem 1.5rem;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-white {
+        background: white;
+        color: #f093fb;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .info-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        background: #f8f9fa;
+        padding: 1.2rem;
+        border-radius: 10px;
+    }
+
+    .info-label {
+        color: #999;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        color: #333;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .share-chart {
+        display: flex;
+        height: 40px;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+
+    .share-producer {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    .share-artist {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    .description-box {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        line-height: 1.6;
+        color: #666;
+    }
+
+    .collab-status {
+        padding: 0.5rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-active { background: #d4edda; color: #155724; }
+    .status-recording { background: #cce5ff; color: #004085; }
+    .status-mixing { background: #e2d9f3; color: #5a2d82; }
+    .status-completed { background: #d1ecf1; color: #0c5460; }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #f093fb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="{% url 'music:collaboration_list' %}" class="back-link">← Назад до списку</a>
+
+    <div class="collab-header">
+        <span class="collab-status status-{{ collab.status }}">
+            {{ collab.get_status_display }}
+        </span>
+        
+        <h1>{{ collab.project_name }}</h1>
+        
+        <div class="artist-info">
+            <div class="artist-avatar">🎤</div>
+            <div>
+                <strong>Артист:</strong> {{ collab.artist.stage_name|default:collab.artist.username }}
+            </div>
+        </div>
+
+        <div class="collab-meta">
+            {% if collab.beat %}
+            <div>🎹 {{ collab.beat.title }}</div>
+            {% endif %}
+            {% if collab.deadline %}
+            <div>📅 Дедлайн: {{ collab.deadline|date:"d.m.Y" }}</div>
+            {% endif %}
+            <div>📅 Створено: {{ collab.created_at|date:"d.m.Y" }}</div>
+        </div>
+
+        <div class="header-actions">
+            <a href="{% url 'music:collaboration_update' collab.pk %}" class="btn btn-white">✏️ Редагувати</a>
+            <a href="{% url 'music:collaboration_delete' collab.pk %}" class="btn btn-danger">🗑️ Видалити</a>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <h2 class="section-title">💰 Розподіл часток</h2>
+        <div class="share-chart">
+            <div class="share-producer" style="width: {{ collab.producer_share }}%">
+                Продюсер {{ collab.producer_share }}%
+            </div>
+            <div class="share-artist" style="width: {{ collab.artist_share }}%">
+                Артист {{ collab.artist_share }}%
+            </div>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <h2 class="section-title">📋 Деталі проєкту</h2>
+        
+        {% if collab.description %}
+        <h3 style="color: #333; margin-bottom: 0.8rem;">Опис</h3>
+        <div class="description-box">{{ collab.description }}</div>
+        {% endif %}
+
+        {% if collab.notes %}
+        <h3 style="color: #333; margin: 1.5rem 0 0.8rem;">Примітки</h3>
+        <div class="description-box">{{ collab.notes }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,257 @@
+<!-- templates/music/collaboration_list.html -->
+{% extends "music/base.html" %}
+{% block title %}Мої співпраці - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .collabs-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .btn-primary {
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+    }
+
+    .collabs-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .collab-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid #f093fb;
+    }
+
+    .collab-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .collab-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .collab-title {
+        font-size: 1.4rem;
+        color: #333;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .artist-name {
+        color: #f093fb;
+        font-size: 1rem;
+    }
+
+    .collab-status {
+        padding: 0.5rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-active { background: #d4edda; color: #155724; }
+    .status-recording { background: #cce5ff; color: #004085; }
+    .status-mixing { background: #e2d9f3; color: #5a2d82; }
+    .status-completed { background: #d1ecf1; color: #0c5460; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+
+    .collab-body {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .collab-field {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 10px;
+    }
+
+    .field-label {
+        color: #999;
+        font-size: 0.85rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .field-value {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .collab-actions {
+        display: flex;
+        gap: 0.8rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1.5rem;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-view {
+        background: #f093fb;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #e07fea;
+    }
+
+    .btn-edit {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #5568d3;
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #c82333;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #f093fb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .overdue-badge {
+        background: #dc3545;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="collabs-container">
+    <a href="{% url 'music:producer_dashboard' %}" class="back-link">← Назад до панелі</a>
+
+    <div class="page-header">
+        <h1>🤝 Мої співпраці</h1>
+        <a href="{% url 'music:collaboration_create' %}" class="btn-primary">➕ Нова співпраця</a>
+    </div>
+
+    {% if collabs %}
+    <div class="collabs-grid">
+        {% for collab in collabs %}
+        <div class="collab-card">
+            <div class="collab-header">
+                <div>
+                    <div class="collab-title">{{ collab.project_name }}</div>
+                    <div class="artist-name">з {{ collab.artist.stage_name|default:collab.artist.username }}</div>
+                </div>
+                <span class="collab-status status-{{ collab.status }}">
+                    {{ collab.get_status_display }}
+                    {% if collab.is_overdue %}<span class="overdue-badge">Прострочено</span>{% endif %}
+                </span>
+            </div>
+
+            <div class="collab-body">
+                {% if collab.beat %}
+                <div class="collab-field">
+                    <div class="field-label">Біт</div>
+                    <div class="field-value">{{ collab.beat.title }}</div>
+                </div>
+                {% endif %}
+                <div class="collab-field">
+                    <div class="field-label">Частки</div>
+                    <div class="field-value">{{ collab.producer_share }}% / {{ collab.artist_share }}%</div>
+                </div>
+                {% if collab.deadline %}
+                <div class="collab-field">
+                    <div class="field-label">Дедлайн</div>
+                    <div class="field-value">{{ collab.deadline|date:"d.m.Y" }}</div>
+                </div>
+                {% endif %}
+                <div class="collab-field">
+                    <div class="field-label">Створено</div>
+                    <div class="field-value">{{ collab.created_at|date:"d.m.Y" }}</div>
+                </div>
+            </div>
+
+            <div class="collab-actions">
+                <a href="{% url 'music:collaboration_detail' collab.pk %}" class="btn btn-view">Переглянути</a>
+                <a href="{% url 'music:collaboration_update' collab.pk %}" class="btn btn-edit">Редагувати</a>
+                <a href="{% url 'music:collaboration_delete' collab.pk %}" class="btn btn-delete">Видалити</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🤝</div>
+        <h2>У вас поки немає співпраць</h2>
+        <p>Почніть співпрацювати з артистами!</p>
+        <a href="{% url 'music:collaboration_create' %}" class="btn-primary">Створити першу співпрацю</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

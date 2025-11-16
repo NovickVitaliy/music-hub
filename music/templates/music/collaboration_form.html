@@ -1,0 +1,209 @@
+{% extends "music/base.html" %}
+{% block title %}{{ action }} співпрацю - MusicHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .form-card {
+        background: white;
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .form-header h1 {
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #f093fb;
+        box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 1rem;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+    }
+
+    .btn-cancel {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .info-box {
+        background: #e8f4f8;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #17a2b8;
+    }
+
+    .info-box p {
+        margin: 0;
+        color: #0c5460;
+        font-size: 0.9rem;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: #f093fb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <a href="{% if collab %}{% url 'music:collaboration_detail' collab.pk %}{% else %}{% url 'music:collaboration_list' %}{% endif %}" class="back-link">← Назад</a>
+
+    <div class="form-card">
+        <div class="form-header">
+            <h1>{{ action }} співпрацю</h1>
+        </div>
+
+        <div class="info-box">
+            <p>💡 <strong>Важливо:</strong> Сума часток продюсера та артиста повинна дорівнювати 100%</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.project_name.id_for_label }}">{{ form.project_name.label }}</label>
+                {{ form.project_name }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.artist.id_for_label }}">{{ form.artist.label }}</label>
+                    {{ form.artist }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.beat.id_for_label }}">{{ form.beat.label }} (необов'язково)</label>
+                    {{ form.beat }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+                    {{ form.status }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.deadline.id_for_label }}">{{ form.deadline.label }}</label>
+                    {{ form.deadline }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.producer_share.id_for_label }}">{{ form.producer_share.label }}</label>
+                    {{ form.producer_share }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.artist_share.id_for_label }}">{{ form.artist_share.label }}</label>
+                    {{ form.artist_share }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                {{ form.description }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+                {{ form.notes }}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-submit">{{ action }}</button>
+                <a href="{% if collab %}{% url 'music:collaboration_detail' collab.pk %}{% else %}{% url 'music:collaboration_list' %}{% endif %}" class="btn btn-cancel">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
